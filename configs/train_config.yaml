@@ -1,0 +1,13 @@
+# Train config — emotion-fusion
+seed: 42
+optimizer: AdamW
+learning_rate: 0.0003
+weight_decay: 0.0001
+epochs: 30
+scheduler: CosineAnnealingLR
+early_stopping:
+  patience: 7
+  monitor: val_f1_macro
+gradient_clipping: 1.0
+mixed_precision: true
+checkpoint_dir: models/checkpoints

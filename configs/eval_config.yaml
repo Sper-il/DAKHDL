@@ -1,0 +1,8 @@
+# Eval config — emotion-fusion
+metrics: [accuracy, f1_macro, confusion_matrix, inference_time_ms]
+targets:
+  accuracy_face: 0.65
+  accuracy_audio: 0.70
+  accuracy_fusion: 0.70
+  e2e_latency_ms: 200
+report_html: results/runs/<ts>/report.html

@@ -1,0 +1,11 @@
+---
+description: Luôn dùng tiếng Việt có dấu trong mọi phản hồi và nội dung tạo ra
+alwaysApply: true
+---
+
+# Quy tắc ngôn ngữ: tiếng Việt có dấu
+
+- Mọi phản hồi trong chat, giải thích, nhận xét code đều viết bằng tiếng Việt có đầy đủ dấu.
+- Mọi nội dung tạo ra (script thuyết trình, docs, markdown, comment code, tên file trình bày) đều dùng tiếng Việt có dấu, trừ thuật ngữ kỹ thuật giữ nguyên tiếng Anh (ví dụ: DataLoader, TensorBoard, fine-tune, backbone, checkpoint).
+- Không dùng tiếng Trung, không viết tiếng Việt không dấu, không trộn ngôn ngữ khi không cần thiết.
+- Thuật ngữ kỹ thuật viết đúng chính tả gốc, không dịch máy móc (ví dụ: giữ "learning rate", không viết "tỷ lệ học" nếu gây khó hiểu — nếu dịch thì ghi kèm gốc trong ngoặc).

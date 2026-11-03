@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>$PROJECT — $RUN_ID</title>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 960px; margin: 24px auto; padding: 0 16px; color: #222; line-height: 1.6; }
+  table { border-collapse: collapse; width: 100%; margin: 12px 0; }
+  th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+  th { background: #f2f2f2; }
+  .pass { color: #0a7b2e; font-weight: bold; }
+  .fail { color: #b00020; font-weight: bold; }
+  img { max-width: 100%; height: auto; border: 1px solid #ddd; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .grid figure { margin: 0; }
+  .grid figcaption { font-size: 12px; color: #555; }
+  code { background: #f6f6f6; padding: 2px 6px; border-radius: 4px; }
+  .meta { color: #555; font-size: 14px; }
+</style>
+</head>
+<body>
+  <h1>$PROJECT — $RUN_ID</h1>
+  <p class="meta">Commit: <code>$COMMIT</code> | Thời gian: $TIME | Checkpoint: <code>$CHECKPOINT</code></p>
+
+  <h2>1. Bài toán và mục tiêu</h2>
+  <p><strong>Problem:</strong> $PROBLEM</p>
+  <p><strong>Input:</strong> $INPUT_DESC | <strong>Output:</strong> $OUTPUT_DESC</p>
+
+  <h2>2. Kết quả chính</h2>
+  $METRICS_TABLE
+
+  <h2>3. Đồ thị train</h2>
+  $LOSS_CURVE_IMG
+
+  <h2>4. Phân bố dữ liệu</h2>
+  $DATA_DIST_IMG
+  <div class="grid">$TRAIN_SAMPLES</div>
+
+  <h2>5. Mẫu dự đoán tốt nhất</h2>
+  <div class="grid">$GOOD_SAMPLES</div>
+
+  <h2>6. Case tệ nhất và nhận xét</h2>
+  $BAD_CASES
+
+  <h2>7. Pipeline</h2>
+  <p>Latency end-to-end: <strong>$E2E_LATENCY_MS ms</strong> | Throughput: <strong>$THROUGHPUT_RPS req/s</strong> | VRAM: <strong>$VRAM_MB MB</strong></p>
+
+  <h2>8. Limitations và Next steps</h2>
+  <h3>Limitations</h3>
+  $LIMITATIONS
+  <h3>Next steps</h3>
+  $NEXT_STEPS
+</body>
+</html>

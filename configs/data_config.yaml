@@ -1,0 +1,25 @@
+# Data config — emotion-fusion
+seed: 42
+face:
+  raw_csv: data/raw/fer2013.csv
+  processed_dir: data/processed/face
+  image_size: 48
+  mean: [0.5]
+  std: [0.5]
+  batch_size: 64
+  num_workers: 4
+audio:
+  raw_dir: data/raw/audio
+  processed_dir: data/processed/audio
+  sample_rate: 16000
+  duration_sec: 4.0
+  n_mels: 128
+  n_frames: 128
+  batch_size: 32
+  num_workers: 4
+splits:
+  train_ratio: 0.7
+  val_ratio: 0.15
+  test_ratio: 0.15
+  split_by_speaker: true
+labels: [angry, disgust, fear, happy, sad, surprise, neutral]

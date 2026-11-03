@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Data
+data/raw/
+data/processed/face/
+data/processed/audio/
+data/splits/
+
+# Models
+models/checkpoints/
+models/trained/
+*.pt
+*.pth
+*.onnx
+
+# Results
+results/runs/*/
+results/demo/*/
+
+# Logs
+*.log
+logs/
+
+# Secrets
+.env
+*.key
+secrets.yaml

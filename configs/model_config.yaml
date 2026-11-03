@@ -1,0 +1,16 @@
+# Model config — emotion-fusion
+face:
+  name: face_resnet18_gray
+  in_channels: 1
+  num_classes: 7
+  pretrained: true
+audio:
+  name: audio_cnn_4blocks
+  in_channels: 1
+  num_classes: 7
+  dropout: 0.3
+fusion:
+  method: weighted_average
+  w_face: 0.5
+  w_audio: 0.5
+  tune_on_val: true
