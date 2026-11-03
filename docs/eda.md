@@ -43,7 +43,9 @@ Tổng 1.440 WAV, 24 speaker, split theo speaker, seed 42: train 16 speaker (960
 - Cả hai: input đã chuẩn (mặt `[1,48,48]`, mel `[1,128,128]`), sẵn sàng train sanity.
 
 ## 4. Plots và báo cáo HTML
-- `results/eda/report.html` — báo cáo EDA offline một file duy nhất (312 KB, mở bằng double-click, ảnh nhúng base64, không cần mạng). Sinh bằng `python notebooks/2026-11-03_eda_html.py`.
+- `results/eda/report.html` — báo cáo EDA offline một file duy nhất (khoảng 4,5 MB, mở bằng double-click, ảnh và âm thanh nhúng base64, không cần mạng). Sinh bằng `python notebooks/2026-11-03_eda_html.py`.
+- Mục 3 trong báo cáo là gallery 7 cảm xúc: mỗi thẻ gồm ảnh mặt FER2013 48×48, Mel-spectrogram RAVDESS và trình phát âm thanh nghe trực tiếp trong HTML.
+- File mẫu: `face_emotion_<id>_<label>.png`, `mel_emotion_<id>_<label>.png`, `audio_emotion_<id>_<label>.wav` trong `results/eda/`. Trích bằng `python notebooks/2026-11-03_eda_samples.py`.
 - `results/eda/face_train_dist.png`, `face_val_dist.png`, `face_test_dist.png`
 - `results/eda/audio_train_dist.png`, `audio_val_dist.png`, `audio_test_dist.png`
 - `results/eda/face_sample.png`, `results/eda/audio_mel_sample.png`

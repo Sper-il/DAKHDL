@@ -21,6 +21,10 @@ def img_b64(path: Path, max_side: int = 800) -> str:
     b64 = base64.b64encode(buf.getvalue()).decode()
     return f'<img src="data:image/jpeg;base64,{b64}" alt="{path.name}">'
 
+def audio_b64(path: Path) -> str:
+    b64 = base64.b64encode(path.read_bytes()).decode()
+    return f'<audio controls src="data:audio/wav;base64,{b64}"></audio>'
+
 def dist_table(tieu_de: str, csv_path: str) -> str:
     df = pd.read_csv(csv_path, usecols=["label"])
     total = len(df)
@@ -53,6 +57,24 @@ def fig(p: str, caption: str) -> str:
         return f"<figure>{img_b64(fp)}<figcaption>{caption}</figcaption></figure>"
     return f"<p>Thiếu {p}</p>"
 
+# Gallery 7 cam xuc: anh mat + mel + audio nghe truc tiep
+cards = ""
+for i in range(7):
+    face_p = EDA / f"face_emotion_{i}_{LABELS[i]}.png"
+    mel_p = EDA / f"mel_emotion_{i}_{LABELS[i]}.png"
+    wav_p = EDA / f"audio_emotion_{i}_{LABELS[i]}.wav"
+    face_img = img_b64(face_p, max_side=300) if face_p.exists() else "<p>Thiếu ảnh mặt</p>"
+    mel_img = img_b64(mel_p, max_side=600) if mel_p.exists() else "<p>Thiếu mel</p>"
+    audio_tag = audio_b64(wav_p) if wav_p.exists() else "<p>Thiếu wav</p>"
+    cards += f"""<div class="card">
+<h4>{i} — {LABEL_VI[i]} ({LABELS[i]})</h4>
+<div class="face">{face_img}</div>
+<div class="mel">{mel_img}</div>
+<div class="aud">{audio_tag}<br><code>{wav_p.name}</code></div>
+</div>"""
+
+sample_gallery = f'<div class="samples">{cards}</div>'
+
 html = f"""<!DOCTYPE html>
 <html lang="vi"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -63,10 +85,15 @@ table{{border-collapse:collapse;width:100%;margin:12px 0}}
 th,td{{border:1px solid #ccc;padding:8px;text-align:left}}
 th{{background:#f2f2f2}}
 img{{max-width:100%;height:auto;border:1px solid #ddd}}
+audio{{width:100%;margin-top:8px}}
 .grid{{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}}
 figure{{margin:0}}figcaption{{font-size:12px;color:#555}}
 .meta{{color:#555;font-size:14px}}code{{background:#f6f6f6;padding:2px 6px;border-radius:4px}}
 .warn{{background:#fff8e1;border:1px solid #f0c36d;padding:10px;border-radius:6px}}
+.samples{{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}}
+.card{{border:1px solid #ddd;border-radius:8px;padding:12px;background:#fafafa}}
+.card h4{{margin:0 0 8px 0}}
+.card .face img{{max-width:180px}}
 </style></head><body>
 <h1>Báo cáo phân tích dữ liệu (EDA) Emotion-Fusion</h1>
 <p class="meta">Nguồn: <code>data/splits/</code> | Seed 42 | Tổng: FER2013 35.887 mẫu + RAVDESS 1.440 file WAV 24 speaker</p>
@@ -84,11 +111,15 @@ figure{{margin:0}}figcaption{{font-size:12px;color:#555}}
 <div class="grid">{fig("audio_train_dist.png", "Phân bố RAVDESS train")}{fig("audio_val_dist.png", "Phân bố RAVDESS val")}{fig("audio_test_dist.png", "Phân bố RAVDESS test")}{fig("audio_mel_sample.png", "Mel-spectrogram mẫu")}</div>
 <p>Mẫu kiểm tra Actor_03 dài 3,44 giây, đúng chuẩn 3–5 giây, đệm/cắt về 4 giây rồi trích xuất mel 128×128.</p>
 
-<h2>3. Kết luận cho huấn luyện</h2>
+<h2>3. Mẫu minh hoạ 7 cảm xúc (ảnh mặt + mel + âm thanh)</h2>
+<p>Mỗi thẻ gồm: ảnh mặt FER2013 48×48, Mel-spectrogram RAVDESS và trình phát âm thanh nhúng trực tiếp trong file HTML (mở offline vẫn nghe được).</p>
+{sample_gallery}
+
+<h2>4. Kết luận cho huấn luyện</h2>
 <ul><li>Nhánh mặt: dùng weighted cross-entropy + Albumentations (lật ngang, xoay ±10 độ), theo dõi chỉ số <code>val_f1_macro</code>.</li>
 <li>Nhánh tiếng: giữ nguyên chia split theo speaker, dùng SpecAugment (che thời gian/tần số), theo dõi F1 từng lớp, đặc biệt lớp neutral.</li>
 <li>Đầu vào đã chuẩn: ảnh mặt <code>[1,48,48]</code>, mel <code>[1,128,128]</code>, sẵn sàng chạy train sanity.</li></ul>
-<p>Script sinh báo cáo: <code>notebooks/2026-11-03_eda_html.py</code> | Phân tích chi tiết: <code>docs/eda.md</code></p>
+<p>Script sinh báo cáo: <code>notebooks/2026-11-03_eda_html.py</code> | Trích mẫu: <code>notebooks/2026-11-03_eda_samples.py</code> | Phân tích chi tiết: <code>docs/eda.md</code></p>
 </body></html>"""
 
 OUT.write_text(html, encoding="utf-8")
