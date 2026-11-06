@@ -1,16 +1,20 @@
-# Model config — emotion-fusion
+# Model config — emotion-fusion (Anti-Overfitting & High Accuracy)
 face:
   name: face_resnet18_gray
+  stem_type: cifar
   in_channels: 1
   num_classes: 7
   pretrained: true
+  dropout: 0.4
 audio:
-  name: audio_cnn_4blocks
+  name: audio_resnet18_mel
   in_channels: 1
   num_classes: 7
-  dropout: 0.3
+  pretrained: true
+  dropout: 0.4
 fusion:
   method: weighted_average
   w_face: 0.5
   w_audio: 0.5
   tune_on_val: true
+  calibrate_temperature: true

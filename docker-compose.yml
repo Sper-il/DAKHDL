@@ -1,0 +1,26 @@
+services:
+  emotion-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: emotion-fusion:latest
+    container_name: emotion_fusion_container
+    volumes:
+      # Mount thư mục dữ liệu, checkpoints và kết quả ra máy thật để dữ liệu không bị mất
+      - ./data:/app/data
+      - ./models:/app/models
+      - ./results:/app/results
+      - ./configs:/app/configs
+      - ./tools/yt_crawler/youtube_links.txt:/app/tools/yt_crawler/youtube_links.txt
+    working_dir: /app
+    stdin_open: true
+    tty: true
+    # Bật nếu máy dùng NVIDIA GPU và có nvidia-container-toolkit:
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+

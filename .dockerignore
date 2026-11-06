@@ -1,0 +1,40 @@
+# Git & IDE
+.git/
+.gitignore
+.cursor/
+.vscode/
+.idea/
+
+# Python cache & venv
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.venv/
+venv/
+env/
+.pytest_cache/
+
+# Dữ liệu dung lượng lớn (sẽ mount qua Volume khi train/test)
+data/raw/
+data/processed/
+data/splits/
+
+# Model checkpoints dung lượng lớn (mount qua Volume)
+models/checkpoints/
+models/trained/
+*.pt
+*.pth
+*.onnx
+# Giữ lại 2 mô hình ONNX nhẹ của bộ lọc Lip-Sync & Sắc thái mặt trong tools/yt_crawler
+!tools/yt_crawler/*.onnx
+
+# Results & logs
+results/runs/
+results/demo/
+*.log
+logs/
+
+# Docs & Notebooks không bắt buộc khi chạy container (tùy chọn giữ lại hoặc bỏ)
+notebooks/
+

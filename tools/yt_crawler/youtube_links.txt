@@ -1,0 +1,175 @@
+# ==============================================================================
+# DANH SÁCH ĐỀ MỤC, LINK VIDEO & TỪ KHÓA YOUTUBE TIẾNG VIỆT QUY MÔ LỚN
+# (MỤC TIÊU: ~5.000 VIDEO RAW -> ~10.000 MẪU PROCESSED CÓ LIP-SYNC KHỚP MIỆNG NÓI)
+# ==============================================================================
+# Cơ chế lọc & gán nhãn mới:
+# 1. Căn chỉnh khuôn mặt chuẩn 112x112 theo 5 điểm mốc (YuNet) + Theo dõi cử động
+#    khuôn miệng (Active Speaker Lip-Sync) khớp với năng lượng tiếng nói (loại bỏ
+#    triệt để cảnh người đứng nghe hoặc giọng người khác nói ngoài khung hình).
+# 2. Gán nhãn Đa phương thức (Tri-Modal):
+#    - Nhận diện sắc thái khuôn mặt bằng MobileFaceNet FER (88.27% RAF-DB)
+#    - Phân tích âm điệu giọng nói (Pitch F0, ΔF0, Spectral Centroid, Energy)
+#    - Phân tích từ khóa ngữ nghĩa Phụ đề Tiếng Việt (180+ cụm từ cảm xúc)
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# PHẦN A: 14 LINK TRÍCH ĐOẠN PHIM VTV & BẢN TIN VTV24 CHUẨN (ƯU TIÊN CHẠY TRƯỚC)
+# ------------------------------------------------------------------------------
+# [happy]
+https://www.youtube.com/watch?v=hVGpm5XOKIU
+https://www.youtube.com/watch?v=QFjkkc-m9uw
+# [sad]
+https://www.youtube.com/watch?v=iXGBS35yGtc
+https://www.youtube.com/watch?v=dcXwk2ZZkmw
+# [angry]
+https://www.youtube.com/watch?v=pUClq17dTSI
+https://www.youtube.com/watch?v=vLrgNZxJR94
+# [surprise]
+https://www.youtube.com/watch?v=1M4WfG2JRds
+https://www.youtube.com/watch?v=wzqME4Kv4qA
+# [fear]
+https://www.youtube.com/watch?v=gLtCHP8Cy1w
+https://www.youtube.com/watch?v=jcPI8tfHAv4
+# [disgust]
+https://www.youtube.com/watch?v=1m0QyZGoVRA
+https://www.youtube.com/watch?v=HHtRHnRw5hQ
+# [neutral]
+https://www.youtube.com/watch?v=2-vlAvTRYJA
+https://www.youtube.com/watch?v=JE_ZWBbCraI
+
+# ==============================================================================
+# PHẦN B: 105 CỤM TRUY VẤN TỰ ĐỘNG QUY MÔ LỚN (105 x 50 = 5.250 VIDEO TIẾNG VIỆT)
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# ĐỀ MỤC 1: [happy] Vui vẻ, Hài hước, Hạnh phúc (~750 video)
+# ------------------------------------------------------------------------------
+ytsearch50:gia đình mình vui bất thình lình trích đoạn hài vui
+ytsearch50:phim vtv cảnh vui vẻ hạnh phúc cười tươi
+ytsearch50:vợ chồng son phỏng vấn hài hước vui vẻ
+ytsearch50:bạn muốn hẹn hò phỏng vấn cười vui
+ytsearch50:11 tháng 5 ngày trích đoạn vui vẻ hài hước
+ytsearch50:về nhà đi con trích đoạn vui hạnh phúc
+ytsearch50:lối nhỏ vào đời trích đoạn vui vẻ
+ytsearch50:phim ngắn việt nam kết thúc có hậu hạnh phúc
+ytsearch50:phỏng vấn đường phố sài gòn vui vẻ hài hước
+ytsearch50:phỏng vấn sinh viên hà nội vui vẻ cười
+ytsearch50:anh có phải đàn ông không trích đoạn hài
+ytsearch50:nhà trọ balanha trích đoạn hài hước cười
+ytsearch50:chúng ta của 8 năm sau cảnh vui vẻ hạnh phúc
+ytsearch50:gặp nhau cuối tuần tiểu phẩm hài kịch nói
+ytsearch50:kịch nói việt nam cảnh vui mừng hạnh phúc
+
+# ------------------------------------------------------------------------------
+# ĐỀ MỤC 2: [sad] Buồn, Bật khóc, Xúc động, Tâm sự (~750 video)
+# ------------------------------------------------------------------------------
+ytsearch50:thương ngày nắng về trích đoạn khóc xúc động
+ytsearch50:hương vị tình thân cảnh bật khóc đau lòng
+ytsearch50:về nhà đi con cảnh khóc nước mắt xúc động
+ytsearch50:đừng làm mẹ cáu cảnh khóc thương con
+ytsearch50:cây táo nở hoa cảnh khóc bi kịch đau khổ
+ytsearch50:phim truyền hình vtv cảnh chia tay bật khóc
+ytsearch50:điều ước thứ 7 vtv3 câu chuyện xúc động bật khóc
+ytsearch50:trạm yêu thương vtv1 xúc động rơi nước mắt
+ytsearch50:phim ngắn việt nam cảm động rơi nước mắt
+ytsearch50:món quà của cha trích đoạn xúc động khóc
+ytsearch50:cuộc đời vẫn đẹp sao cảnh khóc tủi thân
+ytsearch50:dưới bóng cây hạnh phúc cảnh buồn khóc
+ytsearch50:hành trình công lý cảnh đau buồn nước mắt
+ytsearch50:phỏng vấn tâm sự buồn bật khóc tiếng việt
+ytsearch50:diễn xuất cảnh khóc casting phim việt nam
+
+# ------------------------------------------------------------------------------
+# ĐỀ MỤC 3: [angry] Tức giận, Tranh cãi, Quát tháo, Kịch tính (~750 video)
+# ------------------------------------------------------------------------------
+ytsearch50:phim vtv cảnh tức giận cãi nhau căng thẳng
+ytsearch50:chúng ta của 8 năm sau cảnh tức giận mắng
+ytsearch50:về nhà đi con cảnh bố sơn tức giận mắng
+ytsearch50:hương vị tình thân cảnh cãi vã căng thẳng
+ytsearch50:cây táo nở hoa cảnh tức giận quát tháo
+ytsearch50:đừng bắt em phải quên cảnh tức giận căng thẳng
+ytsearch50:hướng dương ngược nắng cảnh tranh cãi gay gắt
+ytsearch50:hoa hồng trên ngực trái cảnh tức giận mắng
+ytsearch50:sống chung với mẹ chồng cảnh cãi nhau căng thẳng
+ytsearch50:quỳnh búp bê cảnh tức giận đối đầu kịch tính
+ytsearch50:phim truyền hình việt nam cảnh nổi giận quát
+ytsearch50:tranh luận căng thẳng chương trình truyền hình việt
+ytsearch50:phim ngắn việt nam cảnh tức giận phản bội
+ytsearch50:bão ngầm cảnh thẩm vấn căng thẳng tức giận
+ytsearch50:đấu trí vtv1 cảnh đối chất căng thẳng
+
+# ------------------------------------------------------------------------------
+# ĐỀ MỤC 4: [surprise] Ngạc nhiên, Bất ngờ, Sửng sốt (~750 video)
+# ------------------------------------------------------------------------------
+ytsearch50:đi giữa trời rực rỡ trích đoạn bất ngờ ngạc nhiên
+ytsearch50:phim vtv cảnh phát hiện sự thật bất ngờ sững sờ
+ytsearch50:gia đình mình vui bất thình lình cảnh bất ngờ
+ytsearch50:hương vị tình thân cảnh ngạc nhiên sửng sốt
+ytsearch50:ảo thuật đường phố việt nam phản ứng kinh ngạc
+ytsearch50:bất ngờ tặng quà phản ứng vỡ òa tiếng việt
+ytsearch50:về nhà đi con cảnh phát hiện bất ngờ
+ytsearch50:hướng dương ngược nắng cảnh sững sờ bất ngờ
+ytsearch50:phim ngắn việt nam cú twist bất ngờ ngạc nhiên
+ytsearch50:thương ngày nắng về cảnh ngỡ ngàng phát hiện
+ytsearch50:mặt nạ gương cảnh phát hiện bí mật bất ngờ
+ytsearch50:biệt dược đen cảnh bất ngờ lộ diện
+ytsearch50:nhà trọ balanha cảnh ngạc nhiên hài hước
+ytsearch50:11 tháng 5 ngày cảnh bất ngờ sững sờ
+ytsearch50:phỏng vấn bất ngờ đường phố việt nam
+
+# ------------------------------------------------------------------------------
+# ĐỀ MỤC 5: [fear] Sợ hãi, Hoảng loạn, Lo lắng (~750 video)
+# ------------------------------------------------------------------------------
+ytsearch50:biệt dược đen trích đoạn hoảng sợ lo lắng
+ytsearch50:mê cung vtv3 cảnh sợ hãi chạy trốn kịch tính
+ytsearch50:người phán xử cảnh sợ hãi hoảng loạn
+ytsearch50:quỳnh búp bê cảnh sợ hãi cầu cứu
+ytsearch50:mặt nạ gương cảnh hoảng sợ kịch tính
+ytsearch50:phim hình sự vtv cảnh tội phạm hoảng sợ
+ytsearch50:hồ sơ cá sấu cảnh lo sợ nguy hiểm
+ytsearch50:bão ngầm cảnh hoảng loạn sợ hãi
+ytsearch50:sinh tử vtv1 cảnh lo lắng sợ hãi
+ytsearch50:phim kinh dị ngắn việt nam cảnh hoảng sợ
+ytsearch50:thử thách nhà ma việt nam sợ hét toáng
+ytsearch50:camera giấu kín dọa ma giật mình tiếng việt
+ytsearch50:hành trình công lý cảnh hoảng loạn lo sợ
+ytsearch50:trói buộc yêu thương cảnh lo lắng sợ hãi
+ytsearch50:lựa chọn số phận cảnh nguy hiểm sợ hãi
+
+# ------------------------------------------------------------------------------
+# ĐỀ MỤC 6: [disgust] Khó chịu, Chán ghét, Khinh bỉ (~750 video)
+# ------------------------------------------------------------------------------
+ytsearch50:đừng làm mẹ cáu trích đoạn khó chịu chán ghét
+ytsearch50:sống chung với mẹ chồng cảnh khó chịu xét nét
+ytsearch50:hương vị tình thân cảnh bà xuân khó chịu khinh thường
+ytsearch50:cây táo nở hoa cảnh chán ngán mệt mỏi khó chịu
+ytsearch50:thương ngày nắng về cảnh mẹ chồng khó chịu
+ytsearch50:hoa hồng trên ngực trái cảnh chán ghét khinh bỉ
+ytsearch50:dưới bóng cây hạnh phúc cảnh khó chịu phàn nàn
+ytsearch50:phim vtv cảnh thái độ khinh thường khó chịu
+ytsearch50:review đồ ăn dở phản ứng nhăn mặt tiếng việt
+ytsearch50:ăn thử món lạ kinh dị phản ứng rùng mình tiếng việt
+ytsearch50:cuộc đời vẫn đẹp sao cảnh khó chịu cằn nhằn
+ytsearch50:gia đình mình vui bất thình lình cảnh khó chịu
+ytsearch50:trói buộc yêu thương cảnh thái độ gay gắt khó chịu
+ytsearch50:tình yêu và tham vọng cảnh khinh thường khó chịu
+ytsearch50:phim truyền hình việt nam cảnh ghét bỏ khó chịu
+
+# ------------------------------------------------------------------------------
+# ĐỀ MỤC 7: [neutral] Bình thường, Điềm tĩnh, Bản tin, Chia sẻ (~750 video)
+# ------------------------------------------------------------------------------
+ytsearch50:bản tin tài chính kinh doanh vtv1 biên tập viên
+ytsearch50:điểm tuần vtv24 bình luận điềm tĩnh
+ytsearch50:thời sự vtv1 phỏng vấn chuyên gia kinh tế
+ytsearch50:cà phê sáng vtv3 trò chuyện khách mời
+ytsearch50:vtv2 chất lượng cuộc sống tư vấn bác sĩ
+ytsearch50:chuyển động 24h vtv1 dẫn chương trình trường quay
+ytsearch50:vtv4 talk vietnam phỏng vấn tiếng việt
+ytsearch50:bản tin thời sự htv9 dẫn chương trình rõ mặt
+ytsearch50:phỏng vấn chuyên gia giáo dục truyền hình nhân dân
+ytsearch50:vtvcab bản tin thể thao dẫn chương trình
+ytsearch50:chia sẻ kiến thức sức khỏe bác sĩ nói chuyện
+ytsearch50:tọa đàm đối thoại chính sách vtv1
+ytsearch50:góc nhìn văn hóa vtv1 biên tập viên dẫn
+ytsearch50:vtv3 vui khỏe có ích tư vấn chuyên gia
+ytsearch50:bản tin công nghệ vtv2 dẫn chương trình

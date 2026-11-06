@@ -16,6 +16,7 @@ models/trained/
 *.pt
 *.pth
 *.onnx
+!tools/yt_crawler/*.onnx
 
 # Results
 results/runs/*/
