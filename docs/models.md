@@ -3,11 +3,11 @@
 > Tài liệu kiến trúc model duy nhất. Đồng bộ với `configs/model_config.yaml` và `src/models/`.
 
 ## 1. Tổng quan
-Hệ thống gồm 2 nhánh độc lập, mỗi nhánh ra phân bố xác suất 7 cảm xúc, sau đó gộp bằng late fusion có trọng số:
+Hệ thống gồm 2 nhánh độc lập: mặt 7 lớp, tiếng 10 lớp, sau đó gộp bằng late fusion có trọng số về 7 lớp chung:
 
 ```
 [Ảnh xám 48x48] → Face-CNN (ResNet-18 grayscale) → probs_face[7]
-[WAV 16 kHz mono 4s] → Mel 128x128 → Audio-CNN (4 khối conv + GAP) → probs_audio[7]
+[WAV 16 kHz mono 4s] → Mel 128x128 → Audio-CNN (4 khối conv + GAP) → probs_audio[10]
 probs_face + probs_audio → Late Fusion (w_face * p_face + w_audio * p_audio) → emotion + confidence
 ```
 
@@ -26,8 +26,8 @@ Thứ tự cố định dùng chung, nhánh mặt giữ 7 lớp, nhánh tiếng 
 | 5 | surprise | Ngạc nhiên (CREMA-D không có, bù từ ASVP-ESD) |
 | 6 | neutral | Trung tính (gộp calm) |
 | 7 | contempt | Khinh bỉ — chỉ nhánh tiếng (ASVP-ESD) |
-| 8 | boredom | Chán nản — chỉ nhánh tiếng (ASVP-ESD, EMO-DB) |
-| 9 | excited | Hào hứng — chỉ nhánh tiếng (ASVP-ESD, IEMOCAP) |
+| 8 | boredom | Chán nản — chỉ nhánh tiếng (ASVP-ESD) |
+| 9 | excited | Hào hứng — chỉ nhánh tiếng (ASVP-ESD) |
 
 Hằng số: `EMOTIONS` (10 lớp) và `EMOTIONS_7` (7 lớp chung) trong `src/models/fusion.py`. Fusion cắt về 7 lớp chung rồi mới cộng trọng số.
 

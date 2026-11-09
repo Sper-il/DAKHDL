@@ -1,33 +1,33 @@
 # Hệ thống nhận diện cảm xúc từ khuôn mặt và âm thanh (Emotion Fusion)
 
-> Nhận diện 7 cảm xúc cơ bản từ ảnh khuôn mặt và giọng nói bằng Deep Learning với fusion muộn, báo cáo bằng một file HTML offline.
+> Nhận diện 7 cảm xúc chung từ ảnh khuôn mặt và giọng nói bằng Deep Learning với fusion muộn; nhánh tiếng mở rộng 10 lớp nhờ ASVP-ESD, báo cáo bằng một file HTML offline.
 
 ## 1. Project Overview
-Project nghiên cứu và xây dựng hệ thống nhận diện cảm xúc đa mô hình cho đồ án môn học. Hệ thống gồm hai nhánh độc lập: nhánh mặt dùng CNN trên ảnh xám 48x48 (FER2013) và nhánh tiếng dùng CNN trên Mel-spectrogram (RAVDESS/CREMA-D), sau đó gộp xác suất bằng late fusion.
+Project nghiên cứu và xây dựng hệ thống nhận diện cảm xúc đa mô hình cho đồ án môn học. Hệ thống gồm hai nhánh độc lập: nhánh mặt dùng CNN trên ảnh xám 48x48 (FER2013, 7 lớp) và nhánh tiếng dùng CNN trên Mel-spectrogram (gộp RAVDESS + CREMA-D + ASVP-ESD, 21.109 WAV, 10 lớp), sau đó căn về 7 lớp chung rồi gộp xác suất bằng late fusion.
 
 Đối tượng dùng là sinh viên và giảng viên: chạy trên GPU lab, xem kết quả qua `report.html` mở bằng double-click, demo bằng một lệnh duy nhất. Mọi quyết định Define và Design đã chốt trong `docs/progress_status.md`.
 
 ## 2. Problem Statement
-Nhận diện 7 cảm xúc (angry, disgust, fear, happy, sad, surprise, neutral) từ khuôn mặt và giọng nói. Bài toán khó vì FER2013 mất cân bằng lớp, ảnh nhỏ 48x48, âm thanh nhiễu nền và khác speaker. Mục tiêu MVP: mỗi nhánh đạt Accuracy ≥ 0,65–0,70, fusion cải thiện ≥ 3 điểm so với nhánh đơn tốt nhất, latency end-to-end ≤ 200 ms/mẫu trên GPU.
+Nhận diện cảm xúc từ khuôn mặt (7 lớp theo FER2013) và giọng nói (10 lớp: 7 lớp chung + contempt/boredom/excited từ ASVP-ESD). Bài toán khó vì FER2013 mất cân bằng lớp, ảnh nhỏ 48x48, âm thanh nhiễu nền và khác speaker, 3 lớp tiếng mới ít mẫu. Mục tiêu MVP: mặt ≥ 0,65, tiếng ≥ 0,70, fusion 7 lớp chung ≥ 0,70 và hơn nhánh đơn tốt nhất ≥ 3 điểm, latency end-to-end ≤ 200 ms/mẫu trên GPU.
 
 ## 3. Main Features
 | Độ ưu tiên | Tính năng | Lý do |
 |------------|-----------|-------|
 | Must | Data pipeline mặt (48x48) + tiếng (mel 128x128), split 70/15/15 seed 42 | Không có dữ liệu sạch thì mọi model đều sai |
-| Must | Face-CNN + Audio-CNN + late fusion có trọng số | Yêu cầu cốt lõi của đề tài đa mô hình |
+| Must | Face-CNN 7 lớp + Audio-CNN 10 lớp + late fusion căn 7 lớp chung | Yêu cầu cốt lõi của đề tài đa mô hình |
 | Must | Eval 2 lớp + `report.html` offline | Chứng minh metric và cho giảng viên chấm không cần mạng |
 | Must | Demo 1 lệnh `python -m src.demo` | Tiêu chí chạy được end-to-end |
 | Should | Confusion matrix per-class + 5 case tệ nhất | Phân tích lỗi trung thực, tăng điểm báo cáo |
 | Should | Thử realtime webcam/micro | Điểm cộng trình diễn nếu latency cho phép |
 | Could | Export ONNX, Gradio UI, API FastAPI | Để tương lai, không làm trong MVP |
 
-Out of scope MVP: nhiều người cùng lúc, video dài, cảm xúc phức tạp ngoài 7 lớp cơ bản.
+Out of scope MVP: nhiều người cùng lúc, video dài, 4 nhãn ASVP còn lại (pleasure/pain/disappointment/breath).
 
 ## 4. System Architecture
 ```
-[Ảnh mặt 48x48] → [Face-CNN] → probs_face[7] ─┐
-                                              ├→ [Late Fusion] → emotion + confidence
-[WAV 16kHz] → [Mel 128x128] → [Audio-CNN] → probs_audio[7] ─┘
+[Ảnh mặt 48x48] → [Face-CNN 7 lớp] → probs_face[7] ─┐
+                                                     ├→ [Late Fusion căn 7 lớp chung] → emotion + confidence
+[WAV 16kHz] → [Mel 128x128] → [Audio-CNN 10 lớp] → probs_audio[10] ─┘
 ```
 
 Chi tiết xem `docs/architecture.md`, luồng dữ liệu xem `docs/data-flow.md`, API từng module xem `docs/api.md`.

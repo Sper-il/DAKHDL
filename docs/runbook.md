@@ -3,7 +3,7 @@
 > Mọi lệnh chạy theo đúng thứ tự: setup → split → sanity → train → eval → visualize → demo. Mỗi lệnh đều ghi rõ input, output và cách kiểm tra.
 
 ## 0. Quy ước đường dẫn
-- Dữ liệu gốc: `data/raw/fer2013.csv`, `data/raw/audio/*.wav` (RAVDESS) + `data/raw/crema/AudioWAV/*.wav` (CREMA-D bổ sung) + `data/raw/asvp/{Speech,NonSpeech}/*.wav` (ASVP-ESD bổ sung 4 nhóm cảm xúc mới).
+- Dữ liệu gốc: `data/raw/fer2013.csv`, `data/raw/audio/*.wav` (RAVDESS 1.440 file) + `data/raw/crema/AudioWAV/*.wav` (CREMA-D 7.442 file) + `data/raw/asvp/{Audio,Bonus}/actor_*/*.wav` (ASVP-ESD bản Kaggle 13.964 WAV, giữ 12.227 file thuộc 9/13 nhãn).
 - Split: `data/splits/face_*.csv` (7 lớp), `data/splits/audio_*.csv` (10 lớp, cột audio: `filepath,speaker,label,source`).
 - Checkpoint: `models/checkpoints/<face|audio>/best.pt` (face `[7]`, audio `[10]`).
 - Kết quả: `results/runs/<ts>/`, demo: `results/demo/<ts>/`.
@@ -15,7 +15,7 @@ python -m src.data.download_cremad
 python -m src.data.download_asvp
 python -m src.data.make_splits
 ```
-- **Kiểm tra**: đủ 6 file split, mặt train 28.709 / val 3.589 / test 3.589, tiếng chỉ RAVDESS: train 960 / val 180 / test 300; nếu có CREMA-D: tổng khoảng 8.882 mẫu; nếu thêm ASVP: cộng tới ~7.634 clip (lọc 9/13 nhãn), split theo speaker gộp 3 nguồn.
+- **Kiểm tra**: đủ 6 file split, mặt train 28.709 / val 3.589 / test 3.589, tiếng gộp 3 nguồn tổng 21.109 mẫu (train 14.457 / val 3.200 / test 3.452, 246 speaker), split theo speaker seed 42.
 - **Verify loader**:
 ```bash
 python -m src.data --config configs/data_config.yaml \

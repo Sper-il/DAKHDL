@@ -25,8 +25,8 @@ Ngưỡng pass cuối: fusion ≥ 0,70 và hơn nhánh đơn tốt nhất ≥ 3 
 ## 3. Hàm metric
 Mã nguồn `src/evaluation/metrics.py`:
 
-- `evaluate_branch(model, loader, device)`: accuracy, F1 macro, confusion matrix 7x7, `inference_time_ms` trung bình trên từng mẫu (đồng bộ CUDA khi đo).
-- `evaluate_fusion(face_model, audio_model, loader_pairs, w_face, w_audio)`: yêu cầu cặp face/audio cùng nhãn, assert `yf == ya`, gộp qua `fuse_probs`, trả về accuracy, F1, confusion, latency, trọng số đã dùng.
+- `evaluate_branch(model, loader, device)`: accuracy, F1 macro, confusion matrix (mặt 7x7, tiếng 10x10), `inference_time_ms` trung bình trên từng mẫu (đồng bộ CUDA khi đo).
+- `evaluate_fusion(face_model, audio_model, loader_pairs, w_face, w_audio)`: yêu cầu cặp face/audio cùng nhãn trên 7 lớp chung, assert `yf == ya`, gộp qua `fuse_probs`, trả về accuracy, F1, confusion 7x7, latency, trọng số đã dùng.
 
 ## 4. Lệnh chạy
 ```bash

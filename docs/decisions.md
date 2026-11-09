@@ -9,22 +9,22 @@
 
 ## 2. Quyết định đã chốt
 
-### D-01: 7 cảm xúc cơ bản theo FER2013
-- **Ngày**: 2026-11-01
-- **Quyết định**: Giữ 7 lớp angry, disgust, fear, happy, sad, surprise, neutral.
-- **Lý do**: Khớp FER2013 và RAVDESS, đủ khó để làm báo cáo nhưng vẫn đạt accuracy khả thi cho đồ án.
-- **Loại bỏ**: 4 cảm xúc gọn (mất điểm đa dạng), 8 cảm xúc (thiếu dữ liệu contempt).
+### D-01: 7 lớp mặt theo FER2013, tiếng mở rộng 10 lớp
+- **Ngày**: 2026-11-01 (rà soát 2026-11-09 theo dữ liệu thật 21.109 WAV)
+- **Quyết định**: Nhánh mặt giữ 7 lớp angry, disgust, fear, happy, sad, surprise, neutral; nhánh tiếng mở rộng 10 lớp, thêm contempt (7), boredom (8), excited (9) chỉ có ở ASVP-ESD; fusion căn về 7 lớp chung.
+- **Lý do**: Khớp FER2013 và RAVDESS/CREMA-D/ASVP, đủ khó để làm báo cáo nhưng vẫn đạt accuracy khả thi; ASVP đã bù surprise từ 192 lên 1.778 mẫu.
+- **Loại bỏ**: 4 cảm xúc gọn (mất điểm đa dạng), giữ đủ 13 nhãn ASVP (4 nhãn pleasure/pain/disappointment/breath không ánh xạ được).
 
-### D-02: FER2013 (mặt) + RAVDESS (tiếng)
-- **Ngày**: 2026-11-01
-- **Quyết định**: Mặt dùng FER2013 48x48 xám, tiếng dùng RAVDESS WAV 16 kHz.
+### D-02: FER2013 (mặt) + RAVDESS/CREMA-D/ASVP-ESD (tiếng)
+- **Ngày**: 2026-11-01 (rà soát 2026-11-09)
+- **Quyết định**: Mặt dùng FER2013 48x48 xám (35.887 mẫu); tiếng gộp 3 nguồn 21.109 WAV, 246 speaker (RAVDESS 1.440 + CREMA-D 7.442 + ASVP-ESD 12.227 file dùng được).
 - **Lý do**: Nhẹ, dễ tải, license nghiên cứu, đủ làm MVP trên GPU lab.
 - **Loại bỏ**: AffectNet + IEMOCAP (nặng, license phức tạp, vượt scope MVP).
 
-### D-03: Late fusion gộp xác suất
-- **Ngày**: 2026-11-01
-- **Quyết định**: `p_fused = w_face * p_face + w_audio * p_audio`, chuẩn hóa tổng bằng 1.
-- **Lý do**: Hai nhánh độc lập dễ train, dễ ablation, đúng yêu cầu đa mô hình của đề tài.
+### D-03: Late fusion gộp xác suất, căn về 7 lớp chung
+- **Ngày**: 2026-11-01 (rà soát 2026-11-09)
+- **Quyết định**: `p_fused = w_face * p_face_norm + w_audio * p_audio_norm`, cắt 7 lớp đầu qua `_align_probs` rồi chuẩn hóa tổng bằng 1 (mặt `[7]`, tiếng `[10]` → fusion `[7]`).
+- **Lý do**: Hai nhánh độc lập dễ train, dễ ablation, đúng yêu cầu đa mô hình; tiếng bắt buộc 10 lớp để giữ contempt/boredom/excited nên phải căn lớp mới không vỡ shape.
 - **Loại bỏ**: Early fusion (khó căn tốc độ học 2 modalities), chỉ làm mặt (không đạt yêu cầu đa mô hình).
 
 ### D-04: Local GPU + report.html offline
@@ -40,10 +40,21 @@
 - **Loại bỏ**: Train chung 2 nhánh (lệch gradient), chọn best theo loss train (dễ overfit).
 
 ### D-06: Split tiếng theo speaker, seed 42
-- **Ngày**: 2026-11-01
-- **Quyết định**: Audio split theo speaker (train 960 / val 180 / test 300), mặt giữ cột Usage gốc.
+- **Ngày**: 2026-11-01 (rà soát 2026-11-09)
+- **Quyết định**: Audio split theo speaker gộp 3 nguồn (train 14.457 / 172 speaker, val 3.200 / 36 speaker, test 3.452 / 38 speaker), mặt giữ cột Usage gốc (28.709 / 3.589 / 3.589). Giao speaker train/val/test rỗng.
 - **Lý do**: Chống leakage speaker, split cố định bằng file CSV trong `data/splits/`.
 - **Loại bỏ**: Split random thuần (leakage speaker làm metric ảo).
+
+### D-08: ASVP-ESD lấy bản Kaggle, mã cảm xúc ở token thứ 3
+- **Ngày**: 2026-11-09
+- **Quyết định**: Dùng bản Kaggle `dejolilandry/asvpesdspeech-nonspeech-emotional-utterances` (13.964 WAV `Audio/` + `Bonus/`), mã cảm xúc đọc ở token thứ 3 dạng `03-<01 Speech|02 NonSpeech>-<01..13>-...`, chỉ giữ 9/13 nhãn.
+- **Lý do**: Script Hugging Face `EdwardLin2023/ASVP_ESD` đã deprecated (`load_dataset` báo lỗi), bản Kaggle đọc được offline và đủ 12.227 file dùng được.
+- **Loại bỏ**: Tải qua `datasets.load_dataset` (lỗi script deprecated), đọc mã ở 2 ký tự đầu (sai với format Kaggle).
+
+### D-09: Đọc mel nhanh qua `audio_*_proc.csv`
+- **Ngày**: 2026-11-09
+- **Quyết định**: Train đọc mel `.npy` có sẵn qua cột `mel_path`, không đọc WAV on-the-fly bằng librosa lúc train.
+- **Lý do**: Nhanh hơn, không phụ thuộc librosa lúc train, đã kiểm chứng thiếu 0/21.109 file.
 
 ### D-07: Mọi tài liệu nằm trong docs/, root chỉ giữ README.md
 - **Ngày**: 2026-11-01
