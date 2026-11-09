@@ -1,6 +1,6 @@
 # EDA — Phân tích khám phá dữ liệu Emotion-Fusion
 
-> Chạy bằng `python notebooks/2026-11-03_eda.py`, plots lưu tại `results/eda/`. Dữ liệu chốt: FER2013 mặt 35.887 mẫu + RAVDESS tiếng 1.440 WAV, seed 42.
+> Chạy bằng `python notebooks/2026-11-03_eda.py`, plots lưu tại `results/eda/`. Dữ liệu chốt: FER2013 mặt 35.887 mẫu + tiếng gộp RAVDESS 1.440 WAV và CREMA-D 7.442 WAV (tổng 8.882 mẫu, 115 speaker), seed 42.
 
 ## 1. Nhánh mặt (FER2013, ảnh xám 48x48)
 Tổng 35.887 mẫu, giữ cột `Usage` gốc: train 28.709 / val 3.589 / test 3.589.
@@ -19,23 +19,22 @@ Tổng 35.887 mẫu, giữ cột `Usage` gốc: train 28.709 / val 3.589 / test 
 - Normalize đang dùng mean 0,5 std 0,5 sau khi đưa về [0,1] là hợp lý.
 - Rủi ro: mất cân bằng disgust (gấp 16 lần so với happy) → bắt buộc `class weight` trong `build_loss` + báo F1 macro, không chỉ accuracy.
 
-## 2. Nhánh tiếng (RAVDESS, WAV 16 kHz mono)
-Tổng 1.440 WAV, 24 speaker, split theo speaker, seed 42: train 16 speaker (960) / val 3 speaker (180) / test 5 speaker (300). Không پاکستان leakage speaker (giao nhau rỗng).
+## 2. Nhánh tiếng (gộp RAVDESS + CREMA-D, WAV 16 kHz mono)
+Tổng 8.882 WAV (1.440 RAVDESS + 7.442 CREMA-D), 115 speaker (24 ravdess + 91 crema), split theo speaker, seed 42: train 80 speaker (6.216) / val 17 speaker (1.278) / test 18 speaker (1.388). Không leakage speaker (giao nhau rỗng).
 
 | Cảm xúc | Train | Val | Test | Nhận xét |
 |---------|-------|-----|------|----------|
-| angry (0) | 128 | 24 | 40 | Cân bằng |
-| disgust (1) | 128 | 24 | 40 | Cân bằng |
-| fear (2) | 128 | 24 | 40 | Cân bằng |
-| happy (3) | 128 | 24 | 40 | Cân bằng |
-| sad (4) | 128 | 24 | 40 | Cân bằng |
-| surprise (5) | 128 | 24 | 40 | Cân bằng |
-| neutral (6) | 192 | 36 | 60 | Gồm neutral + calm nên gấp 1,5 lần |
+| angry (0) | 1.028 | 207 | 228 | Gộp 2 nguồn, đủ mẫu |
+| disgust (1) | 1.028 | 207 | 228 | Gộp 2 nguồn, hết lép vế so với trước |
+| fear (2) | 1.028 | 207 | 228 | Gộp 2 nguồn |
+| happy (3) | 1.028 | 207 | 228 | Gộp 2 nguồn |
+| sad (4) | 1.028 | 207 | 228 | Gộp 2 nguồn |
+| surprise (5) | 120 | 40 | 32 | Chỉ có RAVDESS (CREMA-D thiếu), cần bù ASVP-ESD |
+| neutral (6) | 956 | 203 | 216 | Gộp 2 nguồn, đã cân hơn trước |
 
-- Mẫu kiểm tra: `Actor_03/03-01-01-01-01-01-03.wav` dài 3,44 giây, đúng chuẩn 3–5 giây, pad/cắt về 4 giây rồi mel 128x128.
-- Train speakers: actor_03, 04, 05, 06, 07, 08, 11, 13, 15, 16, 18, 20, 21, 22, 23, 24.
-- Val speakers: actor_12, 14, 19. Test speakers: actor_01, 02, 09, 10, 17.
-- Rủi ro: neutral trội hơn → vẫn cần theo dõi F1 per-class; val chỉ 3 speaker nên phương sai cao, không tune quá kỹ trên val.
+- Nguồn train: 5.316 crema + 900 ravdess; val: 978 crema + 300 ravdess; test: 1.148 crema + 240 ravdess.
+- Mẫu kiểm tra: `Actor_02/03-01-01-01-01-01-02.wav` dài 3,64 giây, đúng chuẩn 3–5 giây, pad/cắt về 4 giây rồi mel 128x128.
+- Rủi ro mới: lớp surprise (5) chỉ còn 192/8.882 (2,2%) vì CREMA-D không có surprise → bắt buộc bù từ ASVP-ESD hoặc class weight + augment mạnh; val 17 speaker nên vẫn theo dõi F1 macro thay vì accuracy.
 
 ## 3. Kết luận cho train
 - Mặt: dùng weighted cross-entropy + augment Albumentations (flip, xoay ±10 độ), monitor `val_f1_macro`.

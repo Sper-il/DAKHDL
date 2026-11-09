@@ -38,9 +38,9 @@ def dist_table(tieu_de: str, csv_path: str) -> str:
 face_train = dist_table("FER2013 train", "data/splits/face_train.csv")
 face_val = dist_table("FER2013 val", "data/splits/face_val.csv")
 face_test = dist_table("FER2013 test", "data/splits/face_test.csv")
-audio_train = dist_table("RAVDESS train", "data/splits/audio_train.csv")
-audio_val = dist_table("RAVDESS val", "data/splits/audio_val.csv")
-audio_test = dist_table("RAVDESS test", "data/splits/audio_test.csv")
+audio_train = dist_table("Tiếng train (RAVDESS + CREMA-D)", "data/splits/audio_train.csv")
+audio_val = dist_table("Tiếng val (RAVDESS + CREMA-D)", "data/splits/audio_val.csv")
+audio_test = dist_table("Tiếng test (RAVDESS + CREMA-D)", "data/splits/audio_test.csv")
 
 tr = pd.read_csv("data/splits/audio_train.csv")["speaker"]
 va = pd.read_csv("data/splits/audio_val.csv")["speaker"]
@@ -96,7 +96,7 @@ figure{{margin:0}}figcaption{{font-size:12px;color:#555}}
 .card .face img{{max-width:180px}}
 </style></head><body>
 <h1>Báo cáo phân tích dữ liệu (EDA) Emotion-Fusion</h1>
-<p class="meta">Nguồn: <code>data/splits/</code> | Seed 42 | Tổng: FER2013 35.887 mẫu + RAVDESS 1.440 file WAV 24 speaker</p>
+<p class="meta">Nguồn: <code>data/splits/</code> | Seed 42 | Tổng: FER2013 35.887 mẫu + tiếng gộp RAVDESS 1.440 + CREMA-D 7.442 (8.882 WAV, 115 speaker)</p>
 
 <h2>1. Nhánh mặt (FER2013, ảnh xám 48×48)</h2>
 <div class="warn"><b>Phát hiện chính:</b> lớp <code>disgust</code> (ghê tởm) chỉ chiếm 1,5% tập train (436/28.709), thấp gấp 16 lần so với lớp <code>happy</code>. Bắt buộc dùng weighted loss + tăng cường dữ liệu (augment) + theo dõi F1 macro.</div>
@@ -104,12 +104,12 @@ figure{{margin:0}}figcaption{{font-size:12px;color:#555}}
 <div class="grid">{fig("face_train_dist.png", "Phân bố FER2013 train")}{fig("face_val_dist.png", "Phân bố FER2013 val")}{fig("face_test_dist.png", "Phân bố FER2013 test")}{fig("face_sample.png", "Ảnh mặt mẫu trong tập train")}</div>
 <p>Thống kê pixel trên 2.000 ảnh train: trung bình 129,6, độ lệch chuẩn 64,6, giá trị từ 0 đến 255. Chuẩn hoá mean 0,5 std 0,5 hiện tại là hợp lý.</p>
 
-<h2>2. Nhánh tiếng (RAVDESS, file WAV 16 kHz mono)</h2>
-<div class="warn"><b>Phát hiện chính:</b> dữ liệu gần cân bằng, chỉ lớp <code>neutral</code> (gộp calm) cao gấp 1,5 lần. Tập val chỉ có 3 speaker nên phương sai cao, không tinh chỉnh quá kỹ trên val.</div>
+<h2>2. Nhánh tiếng (gộp RAVDESS + CREMA-D, file WAV 16 kHz mono)</h2>
+<div class="warn"><b>Phát hiện chính:</b> tổng 8.882 WAV (1.440 RAVDESS + 7.442 CREMA-D), 115 speaker, train 6.216 / val 1.278 / test 1.388. Lớp <code>surprise</code> chỉ còn 192 mẫu (2,2%) vì CREMA-D thiếu surprise — cần bù ASVP-ESD + class weight.</div>
 {audio_train}{audio_val}{audio_test}
 {speaker_html}
-<div class="grid">{fig("audio_train_dist.png", "Phân bố RAVDESS train")}{fig("audio_val_dist.png", "Phân bố RAVDESS val")}{fig("audio_test_dist.png", "Phân bố RAVDESS test")}{fig("audio_mel_sample.png", "Mel-spectrogram mẫu")}</div>
-<p>Mẫu kiểm tra Actor_03 dài 3,44 giây, đúng chuẩn 3–5 giây, đệm/cắt về 4 giây rồi trích xuất mel 128×128.</p>
+<div class="grid">{fig("audio_train_dist.png", "Phân bố tiếng train")}{fig("audio_val_dist.png", "Phân bố tiếng val")}{fig("audio_test_dist.png", "Phân bố tiếng test")}{fig("audio_mel_sample.png", "Mel-spectrogram mẫu")}</div>
+<p>Mẫu kiểm tra Actor_02 dài 3,64 giây, đúng chuẩn 3–5 giây, đệm/cắt về 4 giây rồi trích xuất mel 128×128.</p>
 
 <h2>3. Mẫu minh hoạ 7 cảm xúc (ảnh mặt + mel + âm thanh)</h2>
 <p>Mỗi thẻ gồm: ảnh mặt FER2013 48×48, Mel-spectrogram RAVDESS và trình phát âm thanh nhúng trực tiếp trong file HTML (mở offline vẫn nghe được).</p>
