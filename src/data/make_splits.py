@@ -77,15 +77,20 @@ def build_audio_filelist(audio_root: Path, out_csv: Path, crema_root: Path | Non
                 continue
             rows.append({"filepath": str(w.as_posix()), "speaker": f"crema_{actor_id}",
                          "label": CREMA_MAP[emo_code], "source": "crema"})
-    # 3. ASVP-ESD: data/raw/asvp/Speech/actor_0/08_01_90_00_01_02_02_04.wav
-    # 2 so dau la ma 01-09 -> label mo rong 0-9 (7 contempt, 8 boredom, 9 excited)
+    # 3. ASVP-ESD: data/raw/asvp/{Audio,Bonus}/actor_X/03-01-02-...wav
+    # Format Kaggle: 03-<01 Speech|02 NonSpeech>-<emotion 01-13>-... ; emotion o token pos2
+    # Map: 01 boredom->8, 02 neutral->6, 03 happy->3, 04 sad->4, 05 angry->0,
+    #      06 fear->2, 07 disgust/contempt->7, 08 surprise->5, 09 excited->9
+    # (bo qua 10 pleasure, 11 pain, 12 disappointment, 13 breath)
     if asvp_root is not None and asvp_root.exists():
         wavs = sorted(asvp_root.rglob("*.wav"))
         for w in wavs:
-            code = w.stem.split("_")[0] if "_" in w.stem else ""
+            toks = w.stem.split("-")
+            code = toks[2] if len(toks) >= 3 else ""
+            code = code.strip()
             if code not in ASVP_MAP:
                 continue
-            # speaker: uu tien thu muc actor_X, fallback theo Speech/NonSpeech
+            # speaker: uu tien thu muc actor_X, fallback theo Audio/Bonus
             speaker = "asvp_unknown"
             for part in w.parts:
                 if part.startswith("actor_"):

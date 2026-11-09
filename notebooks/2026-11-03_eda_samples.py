@@ -1,4 +1,4 @@
-"""Trich anh mat + mel + wav mau cho 7 cam xuc, luu vao results/eda/."""
+"""Trich anh mat + mel + wav mau cho 10 cam xuc, luu vao results/eda/."""
 from pathlib import Path
 import csv
 import shutil
@@ -9,8 +9,10 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 plt.rcParams["font.family"] = "DejaVu Sans"
 
-LABELS = ["angry", "disgust", "fear", "happy", "sad", "surprise", "neutral"]
-LABELS_VI = ["Giận dữ", "Ghê tởm", "Sợ hãi", "Vui vẻ", "Buồn", "Ngạc nhiên", "Trung tính"]
+LABELS = ["angry", "disgust", "fear", "happy", "sad", "surprise", "neutral",
+          "contempt", "boredom", "excited"]
+LABELS_VI = ["Giận dữ", "Ghê tởm", "Sợ hãi", "Vui vẻ", "Buồn", "Ngạc nhiên", "Trung tính",
+             "Khinh bỉ", "Chán nản", "Hào hứng"]
 EDA = Path("results/eda")
 EDA.mkdir(parents=True, exist_ok=True)
 
@@ -25,8 +27,12 @@ with open(face_csv, encoding="utf-8") as f:
             found[lab] = row["pixels"]
             if len(found) == 7:
                 break
-for i in range(7):
-    arr = np.fromstring(found[i], sep=" ", dtype=np.float32).reshape(48, 48)
+for i in range(10):
+    if i < 7 and i in found:
+        arr = np.fromstring(found[i], sep=" ", dtype=np.float32).reshape(48, 48)
+    else:
+        # lop moi 7-9 chi co o nhanh tieng: dung anh xam trung tinh lam cho giu
+        arr = np.full((48, 48), 128.0, dtype=np.float32)
     plt.figure(figsize=(2.5, 2.5))
     plt.imshow(arr, cmap="gray")
     plt.title(f"{LABELS_VI[i]} ({LABELS[i]})", fontsize=10)
@@ -41,7 +47,7 @@ for i in range(7):
 import librosa
 adf = pd.read_csv("data/splits/audio_train.csv")
 firsts = adf.groupby("label").first().to_dict()["filepath"]
-for i in range(7):
+for i in range(10):
     src = Path(firsts[i])
     dst = EDA / f"audio_emotion_{i}_{LABELS[i]}.wav"
     shutil.copy(src, dst)
@@ -59,4 +65,4 @@ for i in range(7):
     plt.savefig(p, dpi=120)
     plt.close()
     print(f"[samples] wrote {p}")
-print("[samples] xong 7 cam xuc")
+print("[samples] xong 10 cam xuc")

@@ -1,70 +1,54 @@
-"""Tai ASVP-ESD (bo sung 4 nhom cam xuc mo rong) vao data/raw/asvp.
+"""Tai ASVP-ESD (bo sung surprise/contempt/boredom/excited) vao data/raw/asvp.
 
 Chay: python -m src.data.download_asvp [--out data/raw/asvp]
 
-Nguon: HuggingFace EdwardLin2023/ASVP_ESD (2.150 clip Speech + 5.484 clip
-NonSpeech, 13 nhan). Khong can key, chi can mang + `datasets` + `soundfile`.
-File wav se nam o data/raw/asvp/Speech/actor_X/*.wav va NonSpeech/...
-Xong chay: python -m src.data.make_splits (tu gop RAVDESS + CREMA-D + ASVP)
+Nguon thuc te da dung: Kaggle dejolilandry/asvpesdspeech-nonspeech-emotional-
+utterances (ban ASVP-ESD-Update: 13.964 WAV Audio + Bonus, giu 12.227 file
+thuoc 9/13 nhan). Ten file dang 03-<01 Speech|02 NonSpeech>-<emotion 01-13>-...
+ma cam xuc nam o token thu 3 (pos2): 01 boredom->8, 02 neutral->6, 03 happy->3,
+04 sad->4, 05 angry->0, 06 fear->2, 07 disgust/contempt->7, 08 surprise->5,
+09 excited->9 (bo qua 10 pleasure, 11 pain, 12 disappointment, 13 breath).
+
+Xong chay: python -m src.data.make_splits (tu gop RAVDESS + CREMA-D + ASVP,
+split theo speaker, seed 42).
 
 Ghi chu licence: ASVP-ESD dung cho nghien cuu, ghi cong paper
 Landry et al. 2020 khi bao cao.
 """
 from __future__ import annotations
 import argparse
+import shutil
 from pathlib import Path
 
 
-def download_via_datasets(out: Path) -> bool:
+KAGGLE_DATASET = "dejolilandry/asvpesdspeech-nonspeech-emotional-utterances"
+
+
+def download_via_kagglehub(out: Path) -> bool:
     try:
-        from datasets import load_dataset
+        import kagglehub
     except ImportError:
-        print("[asvp] thieu datasets, cai: pip install datasets soundfile")
+        print("[asvp] thieu kagglehub, cai: pip install kagglehub")
         return False
     try:
-        import soundfile as sf
-    except ImportError:
-        print("[asvp] thieu soundfile, cai: pip install soundfile")
-        return False
-    try:
-        print("[asvp] tai EdwardLin2023/ASVP_ESD qua datasets...")
-        ds = load_dataset("EdwardLin2023/ASVP_ESD", split="train")
-        print(f"[asvp] thay {len(ds)} dong, cot: {ds.column_names}")
-        out.mkdir(parents=True, exist_ok=True)
+        print(f"[asvp] tai {KAGGLE_DATASET} qua kagglehub...")
+        src = Path(kagglehub.dataset_download(KAGGLE_DATASET))
+        print(f"[asvp] cache: {src}")
+        # Ban ASVP-ESD-Update chua Audio/ + Bonus/
+        root = src / "ASVP-ESD-Update" if (src / "ASVP-ESD-Update").exists() else src
         n_new = 0
-        for i, row in enumerate(ds):
-            # Cot duong dan goc co dang .../ASVP_ESD/Speech/actor_0/08_01_....wav
-            raw_path = str(row.get("path", f"clip_{i}.wav"))
-            # Tach loai Speech/NonSpeech + ten file tu path goc
-            p = Path(raw_path.replace("\\", "/"))
-            kind = "Speech"
-            for k in ("Speech", "NonSpeech"):
-                if k.lower() in [x.lower() for x in p.parts]:
-                    kind = k
-                    break
-            fname = p.name if p.suffix.lower() == ".wav" else f"clip_{i}.wav"
-            # Speaker: uu tien cot speaker neu co, khong thi lay tu path actor_X
-            speaker = str(row.get("speaker", ""))
-            if not speaker or speaker == "None":
-                speaker = "unknown"
-                for part in p.parts:
-                    if part.startswith("actor_"):
-                        speaker = part
-                        break
-            dst = out / kind / speaker / fname
-            if dst.exists():
+        for kind in ("Audio", "Bonus"):
+            kdir = root / kind
+            if not kdir.exists():
                 continue
-            audio = row.get("audio")
-            if audio is None:
-                continue
-            arr = audio.get("array") if isinstance(audio, dict) else None
-            sr = audio.get("sampling_rate", 16000) if isinstance(audio, dict) else 16000
-            if arr is None:
-                continue
-            dst.parent.mkdir(parents=True, exist_ok=True)
-            sf.write(str(dst), arr, sr)
-            n_new += 1
-        print(f"[asvp] xong: {n_new} file moi -> {out}/Speech + NonSpeech/")
+            for wav in sorted(kdir.rglob("*.wav")):
+                dst = out / kind / wav.relative_to(kdir)
+                if dst.exists():
+                    continue
+                dst.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(wav, dst)
+                n_new += 1
+        print(f"[asvp] xong: {n_new} file moi -> {out}/Audio + Bonus/")
         return True
     except Exception as e:
         print(f"[asvp] tai that bai: {e}")
@@ -76,14 +60,13 @@ def main():
     ap.add_argument("--out", default="data/raw/asvp")
     args = ap.parse_args()
     out = Path(args.out)
-    if download_via_datasets(out):
+    if download_via_kagglehub(out):
         return
     print("[asvp] HUONG DAN THU CONG:")
-    print("  1. Cai: pip install datasets soundfile")
-    print("  2. Chay lai: python -m src.data.download_asvp")
-    print("  3. Neu mang chan HF, tai zip tu trang dataset")
-    print("     https://huggingface.co/datasets/EdwardLin2023/ASVP_ESD")
-    print("     roi giai nen vao data/raw/asvp/ (giu Speech/ + NonSpeech/).")
+    print("  1. Cai: pip install kagglehub")
+    print("  2. Chay: python -c \"import kagglehub; kagglehub.dataset_download(")
+    print(f"     '{KAGGLE_DATASET}')\"")
+    print("  3. Chep thu muc Audio/ + Bonus/ vao data/raw/asvp/")
     print("  4. Chay: python -m src.data.make_splits")
     raise SystemExit(1)
 

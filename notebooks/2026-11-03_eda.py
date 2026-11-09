@@ -8,8 +8,10 @@ import matplotlib.pyplot as plt
 plt.rcParams["font.family"] = "DejaVu Sans"
 plt.rcParams["axes.unicode_minus"] = False
 
-LABELS = ["angry", "disgust", "fear", "happy", "sad", "surprise", "neutral"]
-LABELS_VI = ["Giận dữ", "Ghê tởm", "Sợ hãi", "Vui vẻ", "Buồn", "Ngạc nhiên", "Trung tính"]
+LABELS = ["angry", "disgust", "fear", "happy", "sad", "surprise", "neutral",
+          "contempt", "boredom", "excited"]
+LABELS_VI = ["Giận dữ", "Ghê tởm", "Sợ hãi", "Vui vẻ", "Buồn", "Ngạc nhiên", "Trung tính",
+             "Khinh bỉ", "Chán nản", "Hào hứng"]
 SPLIT_VI = {"train": "huấn luyện", "val": "kiểm định", "test": "kiểm thử"}
 OUT = Path("results/eda")
 OUT.mkdir(parents=True, exist_ok=True)
@@ -36,14 +38,15 @@ for split in ["train", "val", "test"]:
     face_stats[split] = {"total": len(df), "counts": vc}
     plot_dist(vc, f"FER2013 {split} — Phân bố 7 cảm xúc (n={len(df)})", OUT / f"face_{split}_dist.png")
 
-# 2. Audio splits
+# 2. Audio splits (gop RAVDESS + CREMA-D + ASVP-ESD, 10 cam xuc)
 audio_stats = {}
 for split in ["train", "val", "test"]:
     df = pd.read_csv(f"data/splits/audio_{split}.csv")
     vc = df["label"].value_counts().sort_index().to_dict()
     audio_stats[split] = {"total": len(df), "counts": vc,
-                          "speakers": sorted(df["speaker"].unique().tolist())}
-    plot_dist(vc, f"RAVDESS {split} — Phân bố 7 cảm xúc (n={len(df)})", OUT / f"audio_{split}_dist.png")
+                          "speakers": sorted(df["speaker"].unique().tolist()),
+                          "sources": df["source"].value_counts().to_dict() if "source" in df.columns else {}}
+    plot_dist(vc, f"Tieng gop 3 nguon {split} — Phan bo 10 cam xuc (n={len(df)})", OUT / f"audio_{split}_dist.png")
 
 # 3. Kiem tra leakage speaker
 tr = set(pd.read_csv("data/splits/audio_train.csv")["speaker"])

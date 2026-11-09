@@ -4,7 +4,8 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset
 
-EMOTIONS = ["angry", "disgust", "fear", "happy", "sad", "surprise", "neutral"]
+EMOTIONS = ["angry", "disgust", "fear", "happy", "sad", "surprise", "neutral",
+            "contempt", "boredom", "excited"]
 
 
 class AudioDataset(Dataset):
