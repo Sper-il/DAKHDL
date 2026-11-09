@@ -36,7 +36,14 @@ Kết quả mong đợi: `pytest` pass 3/3, `torch` in ra version 2.x, không l�
 ## 4. Chuẩn bị dữ liệu
 - Đặt `fer2013.csv` (hoặc `icml_face_data.csv`) vào `data/raw/`.
 - Giải nén RAVDESS vào `data/raw/audio/` sao cho có 1.440 file WAV của 24 speaker.
-- Chạy split:
+- (Khuyến nghị) Tải thêm CREMA-D vào `data/raw/crema/AudioWAV/` (7.442 file WAV, 91 speaker) để tăng đa dạng giọng nói:
+```bash
+pip install kagglehub huggingface_hub
+python -m src.data.download_cremad
+# Tải thủ công nếu không có mạng/key: https://www.kaggle.com/datasets/ejlok1/cremad
+# Giải nén thư mục AudioWAV vào data/raw/crema/AudioWAV/ rồi chạy split
+```
+- Chạy split (tự gộp RAVDESS + CREMA-D nếu có, chia theo speaker, seed 42):
 ```bash
 python -m src.data.make_splits
 ```

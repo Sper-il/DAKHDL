@@ -3,16 +3,18 @@
 > Mọi lệnh chạy theo đúng thứ tự: setup → split → sanity → train → eval → visualize → demo. Mỗi lệnh đều ghi rõ input, output và cách kiểm tra.
 
 ## 0. Quy ước đường dẫn
-- Dữ liệu gốc: `data/raw/fer2013.csv`, `data/raw/audio/*.wav`.
-- Split: `data/splits/face_*.csv`, `data/splits/audio_*.csv`.
+- Dữ liệu gốc: `data/raw/fer2013.csv`, `data/raw/audio/*.wav` (RAVDESS) + `data/raw/crema/AudioWAV/*.wav` (CREMA-D bổ sung, khuyến nghị).
+- Split: `data/splits/face_*.csv`, `data/splits/audio_*.csv` (cột audio: `filepath,speaker,label,source`).
 - Checkpoint: `models/checkpoints/<face|audio>/best.pt`.
 - Kết quả: `results/runs/<ts>/`, demo: `results/demo/<ts>/`.
 
 ## 1. Split dữ liệu (chạy 1 lần)
 ```bash
+# Tùy chọn: tải CREMA-D trước để gộp vào nhánh tiếng
+python -m src.data.download_cremad
 python -m src.data.make_splits
 ```
-- **Kiểm tra**: đủ 6 file split, mặt train 28.709 / val 3.589 / test 3.589, tiếng train 960 / val 180 / test 300.
+- **Kiểm tra**: đủ 6 file split, mặt train 28.709 / val 3.589 / test 3.589, tiếng chỉ RAVDESS: train 960 / val 180 / test 300; nếu có CREMA-D: tổng khoảng 8.882 mẫu, split theo speaker gộp 2 nguồn.
 - **Verify loader**:
 ```bash
 python -m src.data --config configs/data_config.yaml \

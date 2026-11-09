@@ -10,6 +10,7 @@ face:
   num_workers: 4
 audio:
   raw_dir: data/raw/audio
+  crema_dir: data/raw/crema
   processed_dir: data/processed/audio
   sample_rate: 16000
   duration_sec: 4.0

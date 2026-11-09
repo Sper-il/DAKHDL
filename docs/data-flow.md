@@ -5,8 +5,8 @@
 
 Tiền xử lý: resize 48x48 (giữ nguyên), normalize mean 0,5 std 0,5. Augment chỉ train: flip ngang, xoay ±10 độ, brightness/contrast nhẹ (Albumentations).
 
-## Tiếng (RAVDESS/CREMA-D)
-`data/raw/audio/*.wav` → resample 16 kHz mono → cắt/pad 4 giây → Mel-spectrogram 128 mel x 128 khung → log-mel normalize → `data/processed/audio/` (npy) → `data/splits/audio_{train,val,test}.csv` (split theo speaker, seed 42) → `AudioDataset → {mel [1,128,128], label}`.
+## Tiếng (RAVDESS + CREMA-D bổ sung)
+`data/raw/audio/*.wav` (RAVDESS, 1.440 file, 24 speaker) + `data/raw/crema/AudioWAV/*.wav` (CREMA-D, 7.442 file, 91 speaker, nếu có) → resample 16 kHz mono → cắt/pad 4 giây → Mel-spectrogram 128 mel x 128 khung → log-mel normalize → `data/processed/audio/` (npy) → `data/splits/audio_{train,val,test}.csv` (gộp 2 nguồn, split theo speaker, seed 42) → `AudioDataset → {mel [1,128,128], label}`.
 
 Augment chỉ train: time mask + freq mask (SpecAugment), thêm nhiễu trắng nhẹ.
 

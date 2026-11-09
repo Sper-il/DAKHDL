@@ -11,3 +11,6 @@ pandas>=2.0
 pyyaml>=6.0
 pytest>=8.0
 tensorboard>=2.15
+# Tuy chon de tai CREMA-D bo sung nhanh tieng
+kagglehub>=0.3
+huggingface_hub>=0.23
