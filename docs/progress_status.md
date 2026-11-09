@@ -26,7 +26,7 @@
 - Milestones: W1: scaffold + Define/Design (hiện tại) | W2: data pipeline mặt + tiếng | W3: model 2 nhánh + train baseline | W4: late fusion + eval + `report.html` | W5: demo 1 lệnh + README + nộp bài.
 - Technical risks: overfit FER2013 do mất cân bằng (disgust ít) → weighted loss + augment; leakage speaker giữa train/val tiếng → split theo speaker; VRAM thiếu khi train 2 nhánh → train riêng từng nhánh, batch nhỏ; xem bảng `Risks & Mitigations` bên dưới.
 
-## Active Module: training + evaluation + demo — code xong, chờ train thật
+## Active Module: training + evaluation + demo — sanity xong, chờ train full
 - **Describe** — Train riêng từng nhánh (Trainer + early stopping F1 val), eval 2 lớp + render `report.html`, demo 1 lệnh sinh `index.html`.
 - **Goal / purpose** — Có pipeline chạy được từ split tới báo cáo HTML ngay khi có FER2013 + RAVDESS.
 - **Pipeline** — `splits → trainer.fit() → checkpoints → evaluation → metrics.json + plots + report.html → demo → results/demo/<ts>/`.
@@ -34,11 +34,15 @@
   - [x] `trainer.py` (`train_one_epoch`, `validate`, `save_checkpoint`, early stopping `val_f1_macro`) + `training/__main__.py` CLI theo branch.
   - [x] `evaluation/metrics.py` (`evaluate_branch`, `evaluate_fusion`) + `visualize.py` + `visualize_html.py` + `evaluation/__main__.py`.
   - [x] `demo/__main__.py` 1 lệnh (ảnh + wav → JSON + `index.html`), đo latency live.
-  - [x] Imports OK, `pytest tests/unit` pass 3/3, không lỗi lint.
+  - [x] Imports OK, `pytest tests/unit` pass 4/4, không lỗi lint.
   - [x] Data thật đã có: mặt train 28709 / val 3589 / test 3589 (theo cột Usage gốc), tiếng train 960 / val 180 / test 300 (split theo speaker, seed 42). Loader thật pass shape `[4,1,48,48]` và `[4,1,128,128]`.
-  - [ ] Train sanity nhánh mặt + tiếng (`--sanity`) rồi train full.
-- **Status** — Describe ✅ / Generate ✅ / Review ✅ / Run ✅ (smoke test) / Test ✅ (3/3 + loader thật) / Refactor ⏳ / Commit ⏳
-- **Last run** — `python -m src.data.make_splits` xong; `python -m src.data --face-csv face_val --audio-csv audio_val` pass shape chuẩn.
+  - [x] Dữ liệu demo nhẹ `data/processed/demo/` (3 PNG + 3 WAV, ~1,1 MB) qua `python -m src.data.make_demo`.
+  - [x] Train sanity nhánh mặt + tiếng (`--sanity`, CPU): tiếng train_loss 1,87→1,52, mặt train_loss 2,36→1,41 — loss giảm, sinh `best.pt` 2 nhánh.
+  - [x] Eval sanity `results/runs/20261109-1704/`: mặt acc 0,18 / F1 0,11, tiếng acc 0,39 / F1 0,28 (chưa đạt target, đúng kỳ vọng vì chỉ 2 epoch trên 32 mẫu).
+  - [x] Demo 1 lệnh `results/demo/20261109-1706/`: ra `neutral` conf 0,25, JSON đủ `{emotion, confidence, probs_fused[7], inference_time_ms}`.
+  - [ ] Train full 30 epoch trên GPU lab rồi eval lại để đạt target (mặt ≥ 0,65, tiếng ≥ 0,70).
+- **Status** — Describe ✅ / Generate ✅ / Review ✅ / Run ✅ (sanity + eval + demo thật) / Test ✅ (4/4 + loader thật) / Refactor ✅ / Commit ⏳
+- **Last run** — `python -m src.training --branch audio/face --sanity` xong; `python -m src.evaluation` ra `metrics.json` + `report.html`; `python -m src.demo` ra `result.json` + `index.html`.
 - **DoD checklist** — xem `checklists/dod.md` (workspace skill)
 
 ## Module Log

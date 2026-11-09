@@ -54,15 +54,24 @@ def main():
         train_loader = build_face_loader(args.train_csv, batch_size=bs if not args.sanity else 8,
                                          shuffle=True, num_workers=0,
                                          transform=build_train_face_transform())
-        val_loader = build_face_loader(args.val_csv, batch_size=bs,
+        val_loader = build_face_loader(args.val_csv, batch_size=bs if not args.sanity else 8,
                                        shuffle=False, num_workers=0,
                                        transform=build_val_face_transform())
     else:
         bs = data_cfg["audio"]["batch_size"]
         train_loader = build_audio_loader(args.train_csv, batch_size=bs if not args.sanity else 8,
                                           shuffle=True, num_workers=0)
-        val_loader = build_audio_loader(args.val_csv, batch_size=bs,
+        val_loader = build_audio_loader(args.val_csv, batch_size=bs if not args.sanity else 8,
                                         shuffle=False, num_workers=0)
+
+    if args.sanity:
+        # Sanity: chi lay 32 mau train + 16 mau val de chay nhanh tren CPU
+        # (cat truc tiep df vi FaceDataset/AudioDataset __len__ doc tu len(df))
+        try:
+            train_loader.dataset.df = train_loader.dataset.df.head(32).reset_index(drop=True)
+            val_loader.dataset.df = val_loader.dataset.df.head(16).reset_index(drop=True)
+        except Exception:
+            pass
 
     ts = datetime.now().strftime("%Y%m%d-%H%M")
     run_dir = Path("results/runs") / f"{ts}_{args.branch}"
