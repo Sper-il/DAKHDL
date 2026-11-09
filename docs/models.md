@@ -14,7 +14,7 @@ probs_face + probs_audio → Late Fusion (w_face * p_face + w_audio * p_audio) �
 Mã nguồn: `src/models/face_cnn.py`, `src/models/audio_cnn.py`, `src/models/fusion.py`, dựng chung qua `src/models/architecture.py::build_model(kind)`.
 
 ## 2. Danh mục cảm xúc
-Thứ tự cố định 7 lớp, dùng chung cho mặt và tiếng:
+Thứ tự cố định dùng chung, nhánh mặt giữ 7 lớp, nhánh tiếng mở rộng 10 lớp:
 
 | ID | Nhãn | Ghi chú |
 |----|------|---------|
@@ -23,10 +23,13 @@ Thứ tự cố định 7 lớp, dùng chung cho mặt và tiếng:
 | 2 | fear | Sợ hãi |
 | 3 | happy | Vui vẻ |
 | 4 | sad | Buồn |
-| 5 | surprise | Ngạc nhiên |
-| 6 | neutral | Trung tính |
+| 5 | surprise | Ngạc nhiên (CREMA-D không có, bù từ ASVP-ESD) |
+| 6 | neutral | Trung tính (gộp calm) |
+| 7 | contempt | Khinh bỉ — chỉ nhánh tiếng (ASVP-ESD) |
+| 8 | boredom | Chán nản — chỉ nhánh tiếng (ASVP-ESD, EMO-DB) |
+| 9 | excited | Hào hứng — chỉ nhánh tiếng (ASVP-ESD, IEMOCAP) |
 
-Hằng số: `EMOTIONS` trong `src/models/fusion.py`.
+Hằng số: `EMOTIONS` (10 lớp) và `EMOTIONS_7` (7 lớp chung) trong `src/models/fusion.py`. Fusion cắt về 7 lớp chung rồi mới cộng trọng số.
 
 ## 3. Face-CNN — nhánh khuôn mặt
 - **Backbone**: ResNet-18, `pretrained=True` theo `configs/model_config.yaml`.
@@ -37,16 +40,17 @@ Hằng số: `EMOTIONS` trong `src/models/fusion.py`.
 - **Tham số**: khoảng 11,17M (ResNet-18 chuẩn).
 - **Loss**: `CrossEntropyLoss` có trọng số lớp khi FER2013 mất cân bằng, dựng qua `build_loss(class_weights)`.
 
-## 4. Audio-CNN — nhánh giọng nói
+## 4. Audio-CNN — nhánh giọng nói (10 lớp)
 - **Kiến trúc**: 4 khối `Conv2d-BatchNorm-ReLU x2 + MaxPool2d(2)`, kênh tăng dần 32 → 64 → 128 → 256, sau đó `AdaptiveAvgPool2d(1)`. Xem `src/models/audio_cnn.py`.
-- **Head**: `Flatten → Dropout(0,3) → Linear(256,128) → ReLU → Dropout(0,3) → Linear(128,7)`.
+- **Head**: `Flatten → Dropout(0,3) → Linear(256,128) → ReLU → Dropout(0,3) → Linear(128,10)`.
 - **Input**: Mel-spectrogram log-mel `[B,1,128,128]` (128 mel x 128 khung, chuẩn hóa mean/std theo mẫu).
-- **Output**: logits `[B,7]`, softmax thành `probs[7]`.
+- **Output**: logits `[B,10]` (7 lớp chung + contempt/boredom/excited), softmax thành `probs[10]`.
 - **Tham số**: khoảng 1,21M, nhẹ hơn nhánh mặt nhiều, train nhanh trên CPU.
-- **Tiền xử lý**: resample 16 kHz mono, cắt/pad 4 giây, `n_mels=128`, `power_to_db`, pad/cắt trục thời gian về 128. Xem `src/demo/__main__.py::load_mel_tensor` và `src/data/audio_dataset.py`.
+- **Nguồn nhãn**: RAVDESS (7 lớp) + CREMA-D (6 lớp, thiếu surprise) + ASVP-ESD (bù surprise/contempt/boredom/excited). Xem `ASVP_MAP` trong `src/data/make_splits.py`.
 
 ## 5. Late Fusion
 - **Công thức**: `p_fused = w_face * p_face + w_audio * p_audio`, sau đó chuẩn hóa tổng bằng 1. Mặc định `w_face=0,5`, `w_audio=0,5`.
+- **Căn lớp**: mặt `[7]`, tiếng `[10]` → cắt về 7 lớp chung đầu qua `_align_probs` rồi mới cộng (lớp 7–9 chỉ đánh giá ở nhánh tiếng).
 - **Hàm**: `fuse_probs(p_face, p_audio, w_face, w_audio)` và `predict_fused(face_logits, audio_logits, ...)` trong `src/models/fusion.py`.
 - **Tune trọng số**: `tune_on_val: true` trong `model_config.yaml`, học trên tập val ở giai đoạn eval, không tune trong lúc train nhánh.
 - **Vì sao late fusion**: 2 modalities khác tốc độ học, train riêng ổn định hơn early fusion; dễ ablation mặt đơn / tiếng đơn / fusion; thêm nhánh mới chỉ cần thêm trọng số.
@@ -63,7 +67,7 @@ face:
 audio:
   name: audio_cnn_4blocks
   in_channels: 1
-  num_classes: 7
+  num_classes: 10
   dropout: 0.3
 fusion:
   method: weighted_average
@@ -80,7 +84,7 @@ pytest tests/unit -q
 python -m src.models --help  # nếu có CLI kiểm tra forward
 ```
 
-Forward 1 batch phải đúng shape `[B,7]` cho cả 2 nhánh, fusion ra `[B,7]` chuẩn hóa tổng bằng 1.
+Forward 1 batch phải đúng shape mặt `[B,7]`, tiếng `[B,10]`, fusion ra `[B,7]` (căn về lớp chung) chuẩn hóa tổng bằng 1.
 
 ## 8. Giới hạn và hướng nâng cấp
 - Chỉ ảnh xám 48x48, chưa chịu mặt nghiêng mạnh hay che khuất.

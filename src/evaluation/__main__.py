@@ -53,10 +53,16 @@ def main():
     plot_confusion_matrix(m_face["confusion_matrix"], run_dir / "plots" / "confusion_face.png",
                           title="Confusion matrix — nhánh mặt")
 
-    # Nhánh tiếng (nếu có)
+    # Nhánh tiếng (nếu có) — tự suy num_classes từ checkpoint để tương thích ckpt 7 lớp cũ
     if args.audio_ckpt and args.audio_test_csv:
-        audio_model = build_model("audio", num_classes=7)
         ckpt = torch.load(args.audio_ckpt, map_location="cpu")
+        state = ckpt["model"] if "model" in ckpt else ckpt
+        n_audio = 10
+        for k in ("head.5.weight", "head.6.weight", "head.3.weight", "fc.weight"):
+            if k in state and hasattr(state[k], "shape"):
+                n_audio = int(state[k].shape[0])
+                break
+        audio_model = build_model("audio", num_classes=n_audio)
         audio_model.load_state_dict(ckpt["model"] if "model" in ckpt else ckpt)
         audio_loader = build_audio_loader(args.audio_test_csv, batch_size=32,
                                           shuffle=False, num_workers=0)

@@ -7,7 +7,7 @@ face:
 audio:
   name: audio_cnn_4blocks
   in_channels: 1
-  num_classes: 7
+  num_classes: 10
   dropout: 0.3
 fusion:
   method: weighted_average

@@ -7,15 +7,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-EMOTIONS = ["angry", "disgust", "fear", "happy", "sad", "surprise", "neutral"]
+EMOTIONS = ["angry", "disgust", "fear", "happy", "sad", "surprise", "neutral",
+            "contempt", "boredom", "excited"]
 
 
 def plot_confusion_matrix(cm, save_path: str | Path, title: str = "Confusion matrix"):
     cm = np.array(cm)
+    labels = EMOTIONS[: cm.shape[0]] if cm.shape[0] <= len(EMOTIONS) else [str(i) for i in range(cm.shape[0])]
     fig, ax = plt.subplots(figsize=(6, 5))
     im = ax.imshow(cm, cmap="Blues")
-    ax.set_xticks(range(len(EMOTIONS)), EMOTIONS, rotation=45, ha="right", fontsize=8)
-    ax.set_yticks(range(len(EMOTIONS)), EMOTIONS, fontsize=8)
+    ax.set_xticks(range(len(labels)), labels, rotation=45, ha="right", fontsize=8)
+    ax.set_yticks(range(len(labels)), labels, fontsize=8)
     ax.set_xlabel("Dự đoán")
     ax.set_ylabel("Thực tế")
     ax.set_title(title)

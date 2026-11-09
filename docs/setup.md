@@ -43,7 +43,14 @@ python -m src.data.download_cremad
 # Tải thủ công nếu không có mạng/key: https://www.kaggle.com/datasets/ejlok1/cremad
 # Giải nén thư mục AudioWAV vào data/raw/crema/AudioWAV/ rồi chạy split
 ```
-- Chạy split (tự gộp RAVDESS + CREMA-D nếu có, chia theo speaker, seed 42):
+- (Khuyến nghị) Tải thêm ASVP-ESD vào `data/raw/asvp/` để bù 4 nhóm cảm xúc mới (surprise, contempt, boredom, excited):
+```bash
+pip install datasets soundfile
+python -m src.data.download_asvp
+# Nguồn: https://huggingface.co/datasets/EdwardLin2023/ASVP_ESD (không cần key)
+# Giữ nguyên cấu trúc data/raw/asvp/Speech/actor_X/*.wav và NonSpeech/...
+```
+- Chạy split (tự gộp RAVDESS + CREMA-D + ASVP nếu có, chia theo speaker, seed 42):
 ```bash
 python -m src.data.make_splits
 ```

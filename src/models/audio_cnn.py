@@ -3,9 +3,9 @@ import torch.nn as nn
 
 
 class AudioCNN(nn.Module):
-    """Input [B,1,128,128] -> logits [B,7]."""
+    """Input [B,1,128,128] -> logits [B,num_classes] (mặc định 10: 7 gốc + contempt/boredom/excited)."""
 
-    def __init__(self, num_classes: int = 7, dropout: float = 0.3):
+    def __init__(self, num_classes: int = 10, dropout: float = 0.3):
         super().__init__()
         def block(cin, cout):
             return nn.Sequential(

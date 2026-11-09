@@ -20,6 +20,13 @@ RAVDESS_MAP = {"01": 6, "02": 6, "03": 3, "04": 4, "05": 0, "06": 2, "07": 1, "0
 # 6 cam xuc: ANG->0, DIS->1, FEA->2, HAP->3, SAD->4, NEU->6 (khong co surprise)
 CREMA_MAP = {"ANG": 0, "DIS": 1, "FEA": 2, "HAP": 3, "SAD": 4, "NEU": 6}
 
+# ASVP-ESD filename: data/raw/asvp/Speech/actor_0/08_01_90_00_01_02_02_04.wav
+# 2 so dau la ma cam xuc 01-13: 01 boredom->8, 02 neutral->6, 03 happy->3,
+# 04 sad->4, 05 angry->0, 06 fear->2, 07 disgust/contempt->7,
+# 08 surprise->5, 09 excited->9 (bo qua 10 pleasure, 11 pain, 12 disappointment, 13 breath)
+ASVP_MAP = {"01": 8, "02": 6, "03": 3, "04": 4, "05": 0,
+            "06": 2, "07": 7, "08": 5, "09": 9}
+
 
 def normalize_fer(raw_dir: Path) -> Path:
     """Tra ve duong dan CSV chuan emotion,pixels,Usage trong data/raw."""
@@ -42,8 +49,9 @@ def normalize_fer(raw_dir: Path) -> Path:
     raise FileNotFoundError("Thieu data/raw/fer2013.csv (hoac icml_face_data.csv >1MB)")
 
 
-def build_audio_filelist(audio_root: Path, out_csv: Path, crema_root: Path | None = None) -> Path:
-    """Quét WAV RAVDESS (+ CREMA-D nếu có), sinh file filepath,speaker,label,source."""
+def build_audio_filelist(audio_root: Path, out_csv: Path, crema_root: Path | None = None,
+                         asvp_root: Path | None = None) -> Path:
+    """Quét WAV RAVDESS (+ CREMA-D, ASVP-ESD nếu có), sinh filepath,speaker,label,source."""
     rows = []
     # 1. RAVDESS: data/raw/audio/Actor_XX/03-01-05-01-01-01-03.wav
     if audio_root.exists():
@@ -69,17 +77,34 @@ def build_audio_filelist(audio_root: Path, out_csv: Path, crema_root: Path | Non
                 continue
             rows.append({"filepath": str(w.as_posix()), "speaker": f"crema_{actor_id}",
                          "label": CREMA_MAP[emo_code], "source": "crema"})
+    # 3. ASVP-ESD: data/raw/asvp/Speech/actor_0/08_01_90_00_01_02_02_04.wav
+    # 2 so dau la ma 01-09 -> label mo rong 0-9 (7 contempt, 8 boredom, 9 excited)
+    if asvp_root is not None and asvp_root.exists():
+        wavs = sorted(asvp_root.rglob("*.wav"))
+        for w in wavs:
+            code = w.stem.split("_")[0] if "_" in w.stem else ""
+            if code not in ASVP_MAP:
+                continue
+            # speaker: uu tien thu muc actor_X, fallback theo Speech/NonSpeech
+            speaker = "asvp_unknown"
+            for part in w.parts:
+                if part.startswith("actor_"):
+                    speaker = f"asvp_{part}"
+                    break
+            rows.append({"filepath": str(w.as_posix()), "speaker": speaker,
+                         "label": ASVP_MAP[code], "source": "asvp"})
     if not rows:
-        raise FileNotFoundError(f"Không thấy WAV nào trong {audio_root} (và {crema_root})")
+        raise FileNotFoundError(f"Không thấy WAV nào trong {audio_root} (và {crema_root}, {asvp_root})")
     df = pd.DataFrame(rows)
     out_csv.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(out_csv, index=False)
     n_rav = int((df["source"] == "ravdess").sum()) if "source" in df.columns else len(df)
     n_crema = int((df["source"] == "crema").sum()) if "source" in df.columns else 0
-    print(f"[splits] quét {len(df)} WAV ({n_rav} ravdess + {n_crema} crema), "
+    n_asvp = int((df["source"] == "asvp").sum()) if "source" in df.columns else 0
+    print(f"[splits] quét {len(df)} WAV ({n_rav} ravdess + {n_crema} crema + {n_asvp} asvp), "
           f"{df['speaker'].nunique()} speaker -> {out_csv.name}")
     print(df["label"].value_counts().sort_index().to_dict())
-    if n_crema:
+    if n_crema or n_asvp:
         print(df.groupby("source")["label"].value_counts().to_dict())
     return out_csv
 
@@ -101,21 +126,23 @@ def main():
             n = sum(1 for _ in f) - 1
         print(f"[splits] mat {k}: {n} mau -> {p}")
 
-    # 2. Tieng (RAVDESS + CREMA-D neu co)
+    # 2. Tieng (RAVDESS + CREMA-D + ASVP neu co)
     audio_root = raw / "audio"
     crema_root = raw / "crema"
     if not crema_root.exists():
         # Ho tro dat AudioWAV ngay trong data/raw/crema/
         alt = raw / "crema" / "AudioWAV"
         crema_root = crema_root if crema_root.exists() or alt.exists() else None
+    asvp_root = raw / "asvp"
+    asvp_root = asvp_root if asvp_root.exists() else None
     filelist = splits / "audio_files.csv"
-    build_audio_filelist(audio_root, filelist, crema_root=crema_root)
+    build_audio_filelist(audio_root, filelist, crema_root=crema_root, asvp_root=asvp_root)
     audio_paths = make_audio_filelist_split(filelist, splits)
     for k, p in audio_paths.items():
         with open(p, encoding="utf-8") as f:
             n = sum(1 for _ in f) - 1
         print(f"[splits] tieng {k}: {n} mau -> {p}")
-    print("[splits] xong. Seed=42, audio split theo speaker (gop RAVDESS + CREMA-D).")
+    print("[splits] xong. Seed=42, audio split theo speaker (gop RAVDESS + CREMA-D + ASVP).")
 
 
 if __name__ == "__main__":

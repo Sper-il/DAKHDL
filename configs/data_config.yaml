@@ -11,6 +11,7 @@ face:
 audio:
   raw_dir: data/raw/audio
   crema_dir: data/raw/crema
+  asvp_dir: data/raw/asvp
   processed_dir: data/processed/audio
   sample_rate: 16000
   duration_sec: 4.0
@@ -23,4 +24,4 @@ splits:
   val_ratio: 0.15
   test_ratio: 0.15
   split_by_speaker: true
-labels: [angry, disgust, fear, happy, sad, surprise, neutral]
+labels: [angry, disgust, fear, happy, sad, surprise, neutral, contempt, boredom, excited]

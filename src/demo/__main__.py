@@ -54,9 +54,15 @@ def main():
     with torch.no_grad():
         pf = F.softmax(face_model(load_face_tensor(args.image).to(device)), dim=-1)
         if args.audio_ckpt:
-            audio_model = build_model("audio").to(device).eval()
             ackpt = torch.load(args.audio_ckpt, map_location=device)
-            audio_model.load_state_dict(ackpt["model"] if "model" in ackpt else ackpt)
+            astate = ackpt["model"] if "model" in ackpt else ackpt
+            n_audio = 10
+            for k in ("head.5.weight", "head.6.weight", "head.3.weight", "fc.weight"):
+                if k in astate and hasattr(astate[k], "shape"):
+                    n_audio = int(astate[k].shape[0])
+                    break
+            audio_model = build_model("audio", num_classes=n_audio).to(device).eval()
+            audio_model.load_state_dict(astate)
             pa = F.softmax(audio_model(load_mel_tensor(args.audio).to(device)), dim=-1)
             fused = fuse_probs(pf, pa, args.w_face, args.w_audio)
         else:
