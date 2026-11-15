@@ -4,8 +4,8 @@
 
 ## 0. Quy ước đường dẫn
 - Dữ liệu gốc: `data/raw/fer2013.csv`, `data/raw/audio/*.wav` (RAVDESS 1.440 file) + `data/raw/crema/AudioWAV/*.wav` (CREMA-D 7.442 file) + `data/raw/asvp/{Audio,Bonus}/actor_*/*.wav` (ASVP-ESD bản Kaggle 13.964 WAV, giữ 12.227 file thuộc 9/13 nhãn).
-- Split: `data/splits/face_*.csv` (7 lớp), `data/splits/audio_*.csv` (10 lớp, cột audio: `filepath,speaker,label,source`).
-- Checkpoint: `models/checkpoints/<face|audio>/best.pt` (face `[7]`, audio `[10]`).
+- Split: `data/splits/face_*.csv` (10 lớp, cột `label,pixels,Usage`), `data/splits/audio_*.csv` (10 lớp, cột `filepath,speaker,label,source`).
+- Checkpoint: `models/checkpoints/<face|audio>/best.pt` (face `[10]`, audio `[10]`).
 - Kết quả: `results/runs/<ts>/`, demo: `results/demo/<ts>/`.
 
 ## 1. Split dữ liệu (chạy 1 lần)
@@ -15,7 +15,7 @@ python -m src.data.download_cremad
 python -m src.data.download_asvp
 python -m src.data.make_splits
 ```
-- **Kiểm tra**: đủ 6 file split, mặt train 28.709 / val 3.589 / test 3.589, tiếng gộp 3 nguồn tổng 21.109 mẫu (train 14.457 / val 3.200 / test 3.452, 246 speaker), split theo speaker seed 42.
+- **Kiểm tra**: đủ 6 file split, mặt tổng 39.791 mẫu (FER2013 28.709 / 3.589 / 3.589 + ảnh extra 3.904 → train 31.441 / val 4.175 / test 4.175), tiếng gộp 3 nguồn tổng 21.109 mẫu (train 14.457 / val 3.200 / test 3.452, 246 speaker), split theo speaker seed 42.
 - **Verify loader**:
 ```bash
 python -m src.data --config configs/data_config.yaml \
@@ -50,7 +50,9 @@ python -m src.training --branch audio \
 - **Output**: `best.pt`, `best.state.pt`, `last.pt` trong `models/checkpoints/<branch>/`.
 
 ## 4. Đánh giá + sinh report.html
+> Module `src/evaluation/` chưa triển khai. Xem `docs/evaluation.md` + `docs/visualization.md`.
 ```bash
+# Lệnh sẽ dùng lại sau khi viết lại code
 python -m src.evaluation \
   --face-ckpt models/checkpoints/face/best.pt \
   --face-test-csv data/splits/face_test.csv \
@@ -61,7 +63,9 @@ python -m src.evaluation \
 - **Kiểm tra**: mở `report.html` bằng double-click trên máy không mạng, số khớp `metrics.json`, bảng pass/fail đúng target trong `configs/eval_config.yaml`.
 
 ## 5. Demo 1 lệnh
+> Module `src/demo/` chưa triển khai. Xem `docs/demo.md`.
 ```bash
+# Lệnh sẽ dùng lại sau khi viết lại code
 python -m src.demo \
   --image data/processed/demo/face_01.png \
   --audio data/processed/demo/voice_01.wav \
@@ -69,16 +73,16 @@ python -m src.demo \
   --audio-ckpt models/checkpoints/audio/best.pt
 ```
 - **Output**: `results/demo/<ts>/result.json` + `index.html`.
-- **Đạt**: JSON đủ `{emotion, confidence, probs_fused[7], inference_time_ms}`, latency ≤ 200 ms trên GPU.
+- **Đạt**: JSON đủ `{emotion, confidence, probs_fused[10], inference_time_ms}`, latency ≤ 200 ms trên GPU.
 
 ## 6. Test hồi quy
 ```bash
 pytest tests/unit -q
 ```
-- **Đạt**: 3/3 pass, không warning nghiêm trọng.
+- **Đạt**: 7/7 pass, không warning nghiêm trọng.
 
 ## 7. Khi train fail xem ở đâu
 - Log train: console + `results/runs/<ts>_<branch>/config.yaml` + TensorBoard.
 - Log eval: `results/runs/<ts>/metrics.json` + `report.html` mục Bad Cases.
 - Lỗi data shape: chạy lại bước 1, đối chiếu `docs/data.md` và `docs/data-flow.md`.
-- Lỗi model shape: đối chiếu `docs/models.md` (face `[B,1,48,48]`, audio `[B,1,128,128]`, output `[B,7]`).
+- Lỗi model shape: đối chiếu `docs/models.md` (face `[B,1,48,48]`, audio `[B,1,128,128]`, output cả 2 `[B,10]`, fusion `[B,10]`).

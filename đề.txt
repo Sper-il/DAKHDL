@@ -1,0 +1,1 @@
+Nghiên cứu và xây dựng hệ thống nhận diện cảm xúc con người dựa trên biểu cảm khuôn mặt và tín hiệu âm thanh sử dụng Deep Learning

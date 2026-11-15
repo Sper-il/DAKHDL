@@ -2,7 +2,7 @@
 face:
   name: face_resnet18_gray
   in_channels: 1
-  num_classes: 7
+  num_classes: 10
   pretrained: true
 audio:
   name: audio_cnn_4blocks

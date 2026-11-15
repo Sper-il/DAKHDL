@@ -10,5 +10,5 @@ def test_spec_augment_keeps_shape():
 
 
 def test_label_range():
-    # 7 cảm xúc: 0..6
-    assert 0 <= 0 <= 6 and 0 <= 6 <= 6
+    # Cả 2 nhánh đều dùng 10 lớp: 0..9 (7 gốc + contempt/boredom/excited)
+    assert 0 <= 0 <= 9 and 0 <= 9 <= 9

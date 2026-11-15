@@ -31,7 +31,7 @@ python -c "import torch, librosa, albumentations; print(torch.__version__)"
 pytest tests/unit -q
 ```
 
-Kết quả mong đợi: `pytest` pass 3/3, `torch` in ra version 2.x, không lỗi import `librosa` hay `albumentations`.
+Kết quả mong đợi: `pytest` pass 7/7, `torch` in ra version 2.x, không lỗi import `librosa` hay `albumentations`.
 
 ## 4. Chuẩn bị dữ liệu
 - Đặt `fer2013.csv` (hoặc `icml_face_data.csv`) vào `data/raw/`.

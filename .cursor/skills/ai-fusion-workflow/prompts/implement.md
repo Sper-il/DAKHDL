@@ -22,12 +22,14 @@ Bạn là AI Engineer. Hãy viết code cho module dưới đây theo plan đã 
 2. Docstring cho mỗi class / function public.
 4. Ví dụ sử dụng ở cuối file (trong block `if __name__ == "__main__":`).
 5. Giải thích ngắn (3-5 dòng) cho mỗi quyết định thiết kế quan trọng.
+6. **Danh sách docs cần cập nhật** — ở cuối output, liệt kê file docs nào bị ảnh hưởng bởi code này (theo bảng "Thay đổi trong code → Docs bắt buộc phải sửa" trong `SKILL.md`) và nêu cụ thể cần sửa gì, dựa trên số liệu thật trong code vừa viết (ví dụ: "đổi số lớp → cập nhật `docs/api.md`, `docs/description.md`, `docs/progress_status.md`"). Không sửa docs trong lượt này — chỉ báo cáo để agent cập nhật cùng lúc commit.
 
 # KHÔNG ĐƯỢC
 - KHÔNG thêm tính năng ngoài plan.
 - KHÔNG dùng thư viện chưa có trong requirements.txt (trừ khi được duyệt).
 - KHÔNG commit secrets, hardcoded path, absolute path.
 - KHÔNG viết comment thừa ("# khởi tạo biến x" cho `x = 1`).
+- KHÔNG để docs cũ mâu thuẫn với code mới — luôn báo cáo docs cần cập nhật.
 ```
 
 ## Ví dụ đã điền

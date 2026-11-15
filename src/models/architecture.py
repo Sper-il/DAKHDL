@@ -11,7 +11,7 @@ def build_loss(class_weights=None) -> nn.Module:
     return nn.CrossEntropyLoss(weight=weight)
 
 
-def build_model(kind: str = "face", num_classes: int = 7, pretrained: bool = True, dropout: float = 0.3):
+def build_model(kind: str = "face", num_classes: int = 10, pretrained: bool = True, dropout: float = 0.3):
     """Hàm dựng chung: kind = face | audio."""
     if kind == "face":
         from .face_cnn import build_face_model

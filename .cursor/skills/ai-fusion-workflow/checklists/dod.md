@@ -37,10 +37,16 @@
 - [ ] Không có đoạn code "magic" không giải thích được.
 
 ## Docs đã cập nhật
+> **Điều kiện bắt buộc.** Không tick mục này thì module chưa xong — chưa được đánh dấu ✅ trong Module Log và chưa được commit. Xem mục "Quy tắc bắt buộc — Làm xong module = đã cập nhật docs" trong `SKILL.md` (Giai đoạn 3).
+
+- [ ] **Đã quét thay đổi** — liệt kê mọi thay đổi code vừa làm, map sang bảng "Thay đổi trong code → Docs bắt buộc phải sửa".
+- [ ] **Đã sửa docs theo số liệu thật** — đọc lại từ `configs/`, `splits/`, `processed/`, output runtime; không sửa theo trí nhớ.
+- [ ] **Đã cập nhật `docs/progress_status.md`** — Module Log (dòng mới), Decisions Log, Risks & Mitigations, Active Module → Status ✅ Commit, dòng "Cập nhật lần cuối".
+- [ ] **Đã cập nhật `docs/AI_Usage.md`** — ghi thêm artifact mới (file, prompt, sửa đổi).
 - [ ] `README.md` cập nhật nếu có thay đổi về cách chạy (kèm link `report.html` mới nhất ở mục Results).
-- [ ] `docs/AI_Usage.md` ghi thêm artifact mới (file, prompt, sửa đổi).
-- [ ] `docs/progress_status.md` cập nhật module log, decisions log, risks.
 - [ ] Module eval/visualize đã sinh `results/runs/<ts>/report.html` offline mở được bằng double-click, số khớp `metrics.json`.
+- [ ] **Đã đối chiếu chéo** — grep các con số cũ (số lớp, số mẫu, shape) trong `docs/` và `README.md`, sửa hết chỗ lệch.
+- [ ] **Đã verify** — mở lại từng file docs đã sửa, không còn câu chữ mâu thuẫn với code.
 - [ ] Comment trong code cho phần phức tạp.
 
 ## Committed

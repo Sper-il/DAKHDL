@@ -1,12 +1,12 @@
-"""Nhánh mặt: ResNet-18 grayscale cho 7 cảm xúc."""
+"""Nhánh mặt: ResNet-18 grayscale cho 10 cảm xúc."""
 import torch.nn as nn
 from torchvision import models
 
 
 class FaceCNN(nn.Module):
-    """Input [B,1,48,48] -> logits [B,7]."""
+    """Input [B,1,48,48] -> logits [B,10]."""
 
-    def __init__(self, num_classes: int = 7, pretrained: bool = True):
+    def __init__(self, num_classes: int = 10, pretrained: bool = True):
         super().__init__()
         backbone = models.resnet18(weights=models.ResNet18_Weights.DEFAULT if pretrained else None)
         # Thích ứng ảnh xám: conv1 từ 3 kênh về 1 kênh, giữ trọng số trung bình
@@ -21,5 +21,5 @@ class FaceCNN(nn.Module):
         return self.backbone(x)
 
 
-def build_face_model(num_classes: int = 7, pretrained: bool = True) -> FaceCNN:
+def build_face_model(num_classes: int = 10, pretrained: bool = True) -> FaceCNN:
     return FaceCNN(num_classes=num_classes, pretrained=pretrained)

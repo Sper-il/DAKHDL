@@ -72,7 +72,7 @@
 - [ ] Không có secrets / không có artifact lớn
 - [ ] Code đã self-review
 - [ ] Có thể giải thích được
-- [ ] Docs đã cập nhật
+- [ ] **Docs đã cập nhật theo code mới** (README + AI_Usage + progress_status + docs liên quan)
 - [ ] Đã committed (Conventional Commit)
 ```
 
@@ -83,5 +83,8 @@
 - **Mỗi quyết định quan trọng** — thêm dòng vào "Decisions Log".
 - **Mỗi rủi ro mới phát hiện** — thêm dòng vào "Risks & Mitigations".
 - **Mỗi câu hỏi chưa giải quyết** — thêm dòng vào "Open Questions".
+- **Mỗi lần code thay đổi** — **cập nhật docs liên quan ngay trong lần commit đó**. Không để docs lệch code. Xem bảng "Thay đổi trong code → Docs bắt buộc phải sửa" trong `SKILL.md`.
+
+> ⚠️ **Module chỉ xong (✅) khi docs đã cập nhật.** Nếu docs còn mâu thuẫn với code (số lớp, số mẫu, shape, tên script), Status phải là ⏳ chứ không phải ✅.
 
 Khi tất cả "Open Questions" được tick ✅ và "Active Module" có Status = ✅ Commit, thì project sẵn sàng cho MVP hoàn chỉnh.

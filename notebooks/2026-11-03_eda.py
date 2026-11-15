@@ -33,10 +33,10 @@ def plot_dist(counts: dict, title: str, path: Path):
 # 1. Face splits
 face_stats = {}
 for split in ["train", "val", "test"]:
-    df = pd.read_csv(f"data/splits/face_{split}.csv", usecols=["label"])
-    vc = df["label"].value_counts().sort_index().to_dict()
-    face_stats[split] = {"total": len(df), "counts": vc}
-    plot_dist(vc, f"FER2013 {split} — Phân bố 7 cảm xúc (n={len(df)})", OUT / f"face_{split}_dist.png")
+    dfs = pd.read_csv(f"data/splits/face_{split}.csv", usecols=["label"])
+    vc = dfs["label"].value_counts().sort_index().to_dict()
+    face_stats[split] = {"total": len(dfs), "counts": vc}
+    plot_dist(vc, f"FER2013 + extra {split} — Phân bố 10 cảm xúc (n={len(dfs)})", OUT / f"face_{split}_dist.png")
 
 # 2. Audio splits (gop RAVDESS + CREMA-D + ASVP-ESD, 10 cam xuc)
 audio_stats = {}

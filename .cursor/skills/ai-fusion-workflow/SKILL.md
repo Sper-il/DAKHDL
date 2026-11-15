@@ -15,6 +15,9 @@ Quy trình chuẩn để làm project AI/ML có trách nhiệm, có tài liệu,
 4. **Describe → Generate → Review → Run → Test → Refactor → Commit** — vòng lặp chuẩn.
 5. **CONTEXT là vua** — mọi quyết định, lý do, kết quả đều phải được ghi vào `docs/progress_status.md`.
 6. **AI là công cụ, người là chủ** — mọi output AI phải được review, sửa, và xác minh trước khi merge.
+7. **Code xong ≠ Module xong** — một module chỉ được coi là **xong (✅)** khi `docs/` đã được cập nhật theo code mới. Không có ngoại lệ.
+8. **Docs đi sau code = docs sai** — khi code thay đổi (thêm lớp, đổi shape, đổi số liệu, đổi cấu trúc), các file docs liên quan **phải sửa trong cùng lần commit đó**. Docs cũ là bug, không phải việc để dành sau.
+9. **File rỗng = chưa làm** — module chưa triển khai phải để file **trống hoặc chỉ chứa placeholder** (docstring/comment, không có lệnh thực thi). Tuyệt đối không tạo file rỗng rồi tưởng đã xong. Nếu repo có `scripts/check_pending_modules.py` thì phải chạy pass trước khi commit.
 
 ## Khi nào dùng skill này
 
@@ -81,7 +84,52 @@ Thứ tự build bắt buộc: Data trước, Model sau, Training cuối. Với 
 4. **Review** — tự review theo `prompts/review.md`.
 5. **Run** — chạy thử, ghi log vào `results/runs/<ts>/`.
 6. **Test** — unit test cho flow, integration test cho pipeline (xem `prompts/debug.md` nếu fail).
-7. **Refactor → Commit** — dọn code, thêm docstring, commit Conventional Commit (một module = một commit).
+7. **Refactor → Update docs → Commit** — dọn code, thêm docstring, **cập nhật `docs/` theo code mới**, rồi commit Conventional Commit (một module = một commit).
+
+### Quy tắc bắt buộc — "Làm xong module = đã cập nhật docs"
+
+> Đây là điều kiện **bắt buộc**, không phải khuyến nghị. Một module chỉ tick ✅ trong Module Log khi đã qua đủ checklist dưới đây.
+
+**Khi nào phải cập nhật docs?** — Bất kỳ thay đổi nào sau đây đều kích hoạt nghĩa vụ cập nhật docs:
+
+| Thay đổi trong code | Docs bắt buộc phải sửa |
+|---|---|
+| Thêm / bỏ / đổi tên lớp cảm xúc, label | `docs/description.md`, `docs/api.md`, `docs/progress_status.md` (Project Context), `docs/architecture.md` |
+| Đổi shape input/output (ví dụ `[B,10]` → `[B,7]`) | `docs/api.md`, `docs/architecture.md`, `docs/data-flow.md`, `docs/progress_status.md` |
+| Đổi số lượng mẫu / speaker / split / nguồn dữ liệu | `docs/data.md`, `docs/data-flow.md`, `docs/progress_status.md`, `docs/eda.md` |
+| Đổi kiến trúc model, hàm loss, optimizer, hyperparameter | `docs/models.md`, `docs/training.md`, `docs/architecture.md` |
+| Đổi cách chạy, thêm CLI flag, đổi tên script | `README.md`, `docs/setup.md`, `docs/runbook.md`, `docs/demo.md` |
+| Đổi khối lượng đánh giá / metric / định dạng output | `docs/evaluation.md`, `docs/visualization.md`, `docs/AI_Usage.md` |
+| Thêm dependency / đổi môi trường | `README.md`, `docs/setup.md`, `docs/AI_Usage.md` |
+
+**Checklist cập nhật docs (làm trước khi commit, mỗi module):**
+
+- [ ] **Quét thay đổi** — liệt kê mọi thay đổi code vừa làm, map sang bảng trên.
+- [ ] **Sửa docs theo số liệu thật** — đọc lại từ `configs/`, `splits/`, `processed/`, output runtime; **không** sửa theo trí nhớ.
+- [ ] **Cập nhật `docs/progress_status.md`** — Module Log (dòng mới), Decisions Log (nếu có quyết định), Risks (nếu có rủi ro mới), mục "Active Module" chuyển Status → ✅ Commit, và cập nhật dòng "Cập nhật lần cuối".
+- [ ] **Cập nhật `docs/AI_Usage.md`** — ghi artifact/prompt/điều chỉnh mới.
+- [ ] **Cập nhật `README.md`** — nếu có đổi về cách chạy hoặc kết quả.
+- [ ] **Đối chiếu chéo** — grep các con số cũ (số lớp, số mẫu, shape) trong `docs/` và `README.md`, sửa hết chỗ lệch.
+- [ ] **Verify** — mở lại từng file docs đã sửa, đảm bảo không còn câu chữ mâu thuẫn với code.
+
+**Cách phát hiện docs lệch** (chạy trước khi commit):
+
+```bash
+# Số lớp cảm xúc xuất hiện ở đâu — đối chiếu với code
+grep -rn "num_classes\|EMOTIONS" src/ configs/
+grep -rn "lớp\|classes" docs/ README.md
+
+# Số liệu mẫu / split — đối chiếu với file thật
+ls data/splits/ && wc -l data/splits/*.csv
+```
+
+**Anti-pattern cần tránh:**
+
+- ❌ Commit code xong, để nguyên docs cũ, ghi chú "update docs sau".
+- ❌ Sửa docs bằng trí nhớ thay vì đọc lại config / output thật.
+- ❌ Chỉ sửa `README.md` mà bỏ qua `docs/progress_status.md`.
+- ❌ Đánh dấu Module ✅ trong Module Log khi docs còn mâu thuẫn.
+- ✅ Viết code → **sửa docs ngay trong lần đó** → commit gộp code + docs.
 
 ### Giai đoạn 4 — EVAL + VISUALIZE (đọc `modules/evaluation.md` → `modules/visualization.md`)
 Đánh giá xong là visualize ngay, không để số nằm rời rạc trong log:
@@ -95,6 +143,9 @@ Biến run tốt nhất thành demo 1 lệnh chạy được:
 
 ### Giai đoạn 6 — DOCUMENT (song song mọi giai đoạn, chốt ở cuối)
 Luôn cập nhật song song, chốt đầy đủ khi demo xong:
+
+> **Bắt buộc:** Document không phải giai đoạn cuối mới làm. Mỗi module xong phải cập nhật docs **ngay trong lần commit đó** — xem mục "Quy tắc bắt buộc — Làm xong module = đã cập nhật docs" ở Giai đoạn 3.
+
 - `README.md` — 10 mục chuẩn (xem `templates/readme.md`).
 - `docs/AI_Usage.md` — 7 mục chuẩn (xem `templates/ai-usage.md`).
 - `docs/progress_status.md` — module log, decisions log, risks.
@@ -237,6 +288,7 @@ Khi user bảo "code module X":
 1. Đọc file chuẩn trong `modules/` tương ứng (`data.md` / `model.md` / `training.md` / `evaluation.md` / `visualization.md` / `demo.md`), rồi đọc `prompts/plan.md` để ra Interfaces + Milestones trước, sau đó dùng `prompts/implement.md` để code.
 2. Sau khi nhận code, dùng `prompts/review.md` để review.
 3. Chạy và commit theo vòng lặp.
+4. **Cập nhật docs trước khi commit** — làm theo mục "Quy tắc bắt buộc — Làm xong module = đã cập nhật docs": quét thay đổi → sửa docs liên quan theo số liệu thật → cập nhật `progress_status.md` + `AI_Usage.md` + `README.md` → đối chiếu chéo → verify. Commit gộp code + docs.
 
 Khi user bảo "đánh giá model" / "đánh giá pipeline":
 1. Đọc `modules/evaluation.md`, tách rõ model level và full pipeline.

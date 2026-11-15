@@ -24,5 +24,6 @@
 - `demo.md` — demo 1 lệnh sinh JSON + `index.html`.
 
 ## Quản trị
+- `plan_remaining.md` — 📋 plan công việc còn lại theo 4 bước (1 Train+tuning · 2 Eval · 3 Visualize · 4 Demo) + phân công cho thành viên.
 - `AI_Usage.md` — hồ sơ sử dụng AI trung thực.
 - `CHANGELOG.md` — lịch sử thay đổi.

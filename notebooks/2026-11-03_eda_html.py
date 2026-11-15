@@ -37,9 +37,9 @@ def dist_table(tieu_de: str, csv_path: str, n_cls: int) -> str:
         rows += f"<tr><td>{i}</td><td>{LABELS[i]}</td><td>{LABEL_VI[i]}</td><td>{c}</td><td>{pct:.1f}%</td></tr>"
     return f"<h3>{tieu_de} (n={total})</h3><table><tr><th>ID</th><th>Nhãn</th><th>Tiếng Việt</th><th>Số mẫu</th><th>Tỉ lệ</th></tr>{rows}</table>"
 
-face_train = dist_table("FER2013 train", "data/splits/face_train.csv", 7)
-face_val = dist_table("FER2013 val", "data/splits/face_val.csv", 7)
-face_test = dist_table("FER2013 test", "data/splits/face_test.csv", 7)
+face_train = dist_table("Mặt train (FER2013 + extra)", "data/splits/face_train.csv", 10)
+face_val = dist_table("Mặt val (FER2013 + extra)", "data/splits/face_val.csv", 10)
+face_test = dist_table("Mặt test (FER2013 + extra)", "data/splits/face_test.csv", 10)
 audio_train = dist_table("Tiếng train (RAVDESS + CREMA-D + ASVP-ESD)", "data/splits/audio_train.csv", 10)
 audio_val = dist_table("Tiếng val (RAVDESS + CREMA-D + ASVP-ESD)", "data/splits/audio_val.csv", 10)
 audio_test = dist_table("Tiếng test (RAVDESS + CREMA-D + ASVP-ESD)", "data/splits/audio_test.csv", 10)
@@ -51,7 +51,7 @@ speaker_html = f"""<table><tr><th>Split</th><th>Số speaker</th><th>Số lượ
 <tr><td>train</td><td>{tr.nunique()}</td><td>{len(tr)}</td></tr>
 <tr><td>val</td><td>{va.nunique()}</td><td>{len(va)}</td></tr>
 <tr><td>test</td><td>{te.nunique()}</td><td>{len(te)}</td></tr></table>
-<p>Giao nhau giữa train/val/test: rỗng (không leakage speaker, seed 42). Mặt giữ 7 lớp, tiếng mở rộng 10 lớp.</p>"""
+<p>Giao nhau giữa train/val/test: rỗng (không leakage speaker, seed 42). Cả 2 nhánh đều 10 lớp, fusion cộng trực tiếp không cần cắt.</p>"""
 
 def fig(p: str, caption: str) -> str:
     fp = EDA / p
@@ -98,10 +98,10 @@ figure{{margin:0}}figcaption{{font-size:12px;color:#555}}
 .card .face img{{max-width:180px}}
 </style></head><body>
 <h1>Báo cáo phân tích dữ liệu (EDA) Emotion-Fusion</h1>
-<p class="meta">Nguồn: <code>data/splits/</code> | Seed 42 | Tổng: FER2013 35.887 mẫu + tiếng gộp 3 nguồn 21.109 WAV (1.440 RAVDESS + 7.442 CREMA-D + 12.227 ASVP-ESD, 246 speaker)</p>
+<p class="meta">Nguồn: <code>data/splits/</code> | Seed 42 | Tổng: mặt 39.791 mẫu (FER2013 35.887 + extra 3.904: contempt AffectNet 2.946, boredom Student-Engagement 358, excited proxy từ AffectNet happy 600) + tiếng gộp 3 nguồn 21.109 WAV (1.440 RAVDESS + 7.442 CREMA-D + 12.227 ASVP-ESD, 246 speaker)</p>
 
-<h2>1. Nhánh mặt (FER2013, ảnh xám 48×48)</h2>
-<div class="warn"><b>Phát hiện chính:</b> lớp <code>disgust</code> (ghê tởm) chỉ chiếm 1,5% tập train (436/28.709), thấp gấp 16 lần so với lớp <code>happy</code>. Bắt buộc dùng weighted loss + tăng cường dữ liệu (augment) + theo dõi F1 macro.</div>
+<h2>1. Nhánh mặt (FER2013 + extra, ảnh xám 48×48, 10 lớp)</h2>
+<div class="warn"><b>Phát hiện chính:</b> lớp <code>disgust</code> (ghê tởm) chỉ chiếm 1,4% tập train (436/31.441). 3 lớp mới đã có ảnh thật: <code>contempt</code> 2.062 train (AffectNet crop sẵn), <code>boredom</code> 250 train (Student-Engagement center-crop), <code>excited</code> 420 train (proxy từ AffectNet happy). Bắt buộc dùng weighted loss + augment + theo dõi F1 macro.</div>
 {face_train}{face_val}{face_test}
 <div class="grid">{fig("face_train_dist.png", "Phân bố FER2013 train")}{fig("face_val_dist.png", "Phân bố FER2013 val")}{fig("face_test_dist.png", "Phân bố FER2013 test")}{fig("face_sample.png", "Ảnh mặt mẫu trong tập train")}</div>
 <p>Thống kê pixel trên 2.000 ảnh train: trung bình 129,6, độ lệch chuẩn 64,6, giá trị từ 0 đến 255. Chuẩn hoá mean 0,5 std 0,5 hiện tại là hợp lý.</p>
@@ -114,7 +114,7 @@ figure{{margin:0}}figcaption{{font-size:12px;color:#555}}
 <p>Mẫu kiểm tra dài 3–5 giây, đệm/cắt về 4 giây rồi trích xuất mel 128×128.</p>
 
 <h2>3. Mẫu minh hoạ 10 cảm xúc (ảnh mặt + mel + âm thanh)</h2>
-<p>Mỗi thẻ gồm: ảnh mặt FER2013 48×48 (3 lớp mới chỉ có ở nhánh tiếng nên dùng ảnh giữ chỗ), Mel-spectrogram và trình phát âm thanh nhúng trực tiếp trong file HTML (mở offline vẫn nghe được).</p>
+<p>Mỗi thẻ gồm: ảnh mặt FER2013 48×48 (contempt đã thay bằng ảnh thật AffectNet chuyển xám 48×48; boredom/excited chỉ có ở nhánh tiếng nên vẫn dùng ảnh giữ chỗ), Mel-spectrogram và trình phát âm thanh nhúng trực tiếp trong file HTML (mở offline vẫn nghe được).</p>
 {sample_gallery}
 
 <h2>4. Kết luận cho huấn luyện</h2>

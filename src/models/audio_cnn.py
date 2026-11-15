@@ -37,5 +37,5 @@ class AudioCNN(nn.Module):
         return self.head(self.features(x))
 
 
-def build_audio_model(num_classes: int = 7, dropout: float = 0.3) -> AudioCNN:
+def build_audio_model(num_classes: int = 10, dropout: float = 0.3) -> AudioCNN:
     return AudioCNN(num_classes=num_classes, dropout=dropout)
