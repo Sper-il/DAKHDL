@@ -1,0 +1,20 @@
+# Nhánh MẶT: ResNet-18 ảnh xám 48x48 (pretrained ImageNet)
+name: face_resnet18
+branch: face
+data_root: /content/data        # thư mục chứa thư mục "data" (sau khi giải nén data.zip)
+num_classes: 7                  # 7 = cảm xúc cơ bản (kết quả chính); 10 = đủ bộ (mở rộng)
+
+model:
+  pretrained: true
+  remove_maxpool: false         # thử true hoặc input_size: 96 để cải thiện với ảnh nhỏ
+  input_size: 48
+  dropout: 0.2
+
+train:
+  epochs: 60
+  batch_size: 128
+  lr: 0.001
+  class_weight: inv_sqrt
+
+logging:
+  out_dir: runs

@@ -1,0 +1,22 @@
+# Nhánh TIẾNG: CNN 4 khối trên Mel-spectrogram 128x128 (đã ở thang dB, -80..0)
+name: audio_cnn
+branch: audio
+data_root: /content/data
+num_classes: 7
+
+model:
+  dropout: 0.3
+
+train:
+  epochs: 60
+  batch_size: 64
+  lr: 0.001
+  class_weight: inv_sqrt
+
+augment:
+  freq_mask: 16                 # SpecAugment: che dải tần tối đa 16 hàng
+  time_mask: 24                 # che đoạn thời gian tối đa 24 cột
+  n_masks: 2
+
+logging:
+  out_dir: runs
