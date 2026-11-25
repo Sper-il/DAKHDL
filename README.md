@@ -1,5 +1,45 @@
 # Nhận diện cảm xúc từ khuôn mặt + giọng nói (late fusion)
 
+> [!IMPORTANT]
+> ## 🚀 Hướng dẫn chạy Demo Real-time (Camera + Micro) bằng model đã train sẵn
+>
+> Project đã có sẵn checkpoint `best.pt` cho cả nhánh **Face** (`runs/face_resnet18_20261117_062124/best.pt`) và **Audio** (`runs/audio_cnn_20261117_063812/best.pt`), tự động nạp khi chạy.
+>
+> ### 1. Chạy nhanh (khuyên dùng)
+> Mở Terminal tại thư mục `Model-face-audio-test` và chạy:
+> ```bash
+> cd "/Users/minhhoa/Downloads/Project đồ án/Model-face-audio-test"
+> ./run_realtime.sh
+> ```
+> *(Script tự kích hoạt môi trường `../.venv` và chạy `app_realtime_fusion.py`.)*
+>
+> ### 2. Tùy chọn dòng lệnh (nếu cần)
+> ```bash
+> # Đổi trọng số ưu tiên khuôn mặt (W_face = 0.7, W_audio = 0.3)
+> ./run_realtime.sh --w-face 0.7
+>
+> # Chỉ định checkpoint cụ thể
+> ./run_realtime.sh --face-ckpt runs/face_resnet18_20261117_062124/best.pt --audio-ckpt runs/audio_cnn_20261117_063812/best.pt
+>
+> # Đổi số lớp cảm xúc (7 hoặc 10)
+> ./run_realtime.sh --num-classes 7
+> ```
+>
+> ### 3. Cấp quyền & Thiết bị (macOS)
+> - Lần đầu chạy, bấm **Allow (Cho phép)** khi macOS hỏi quyền truy cập **Camera** và **Microphone** cho Terminal/IDE.
+> - **Camera:** tự động lấy webcam mặc định (MacBook).
+> - **Micro:** lấy thiết bị Input mặc định của macOS (**System Settings → Sound → Input**). Kiểm tra thanh **Mic RMS** ở góc dưới màn hình khi nói.
+>
+> ### 4. Phím tắt khi đang chạy (bấm trên cửa sổ video)
+> | Phím | Chức năng |
+> |---|---|
+> | **`C`** | Bật / tắt Camera |
+> | **`M`** | Bật / tắt Micro |
+> | **`W`** | Đổi trọng số Late Fusion (`0.5` → `0.7` → `0.3`) |
+> | **`Q`** | Thoát chương trình |
+
+---
+
 Dự án gồm **2 phần**:
 
 | Phần | Nội dung | Trạng thái |

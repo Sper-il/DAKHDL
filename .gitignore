@@ -3,3 +3,5 @@ __pycache__/
 runs/
 *.pt
 .ipynb_checkpoints/
+.DS_Store
+.venv/
