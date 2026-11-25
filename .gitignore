@@ -3,5 +3,8 @@ __pycache__/
 runs/
 *.pt
 .ipynb_checkpoints/
+DataViet/
+data_datviet/
+data_datviet.zip
 .DS_Store
 .venv/

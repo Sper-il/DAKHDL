@@ -19,6 +19,7 @@ def main():
                     help="ghi đè cấu hình, vd: data_root=/content/data train.epochs=5")
     ap.add_argument("--run-dir", help="thư mục lưu run (mặc định runs/<name>_<thời gian>)")
     ap.add_argument("--resume", action="store_true", help="tiếp tục từ last.pt trong --run-dir")
+    ap.add_argument("--init-ckpt", help="nạp trọng số khởi tạo từ best.pt để fine-tune")
     a = ap.parse_args()
 
     cfg = load_config(a.config, a.set)
@@ -29,7 +30,7 @@ def main():
         run_dir = Path(cfg["logging"]["out_dir"]) / f"{cfg['name']}_{stamp}"
     if a.resume and not a.run_dir:
         ap.error("--resume cần --run-dir")
-    fit(cfg, run_dir, resume=a.resume)
+    fit(cfg, run_dir, resume=a.resume, init_ckpt=a.init_ckpt)
 
 
 if __name__ == "__main__":

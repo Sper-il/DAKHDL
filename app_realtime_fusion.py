@@ -29,13 +29,16 @@ sys.path.insert(0, str(CURRENT_DIR))
 
 try:
     from src.models import FaceCNN, AudioCNN
-    from src.labels import EMOTIONS, EMOTIONS_VI, class_names
+    from src.labels import EMOTIONS, EMOTIONS_VI, FACE7_TO_4_IDX, class_names, class_names_vi
 except ImportError:
     # Fallback dự phòng nếu chạy từ ngoài
     EMOTIONS = ["angry", "disgust", "fear", "happy", "sad", "surprise", "neutral", "contempt", "boredom", "excited"]
     EMOTIONS_VI = ["Gian du", "Ghe tom", "So hai", "Vui ve", "Buon", "Ngac nhien", "Trung tinh", "Khinh bi", "Chan nan", "Hao hung"]
+    FACE7_TO_4_IDX = [0, 3, 4, 6]
     def class_names(n):
-        return EMOTIONS[:n]
+        return ["angry", "happy", "sad", "neutral"] if n == 4 else EMOTIONS[:n]
+    def class_names_vi(n):
+        return ["Gian du", "Vui ve", "Buon", "Trung tinh"] if n == 4 else EMOTIONS_VI[:n]
 
 # ==========================================
 # CẤU HÌNH THỜI GIAN THỰC
@@ -171,9 +174,10 @@ def main():
     face_model, face_mean, face_std, n_face = load_model_branch(face_ckpt, "face", args.num_classes, device)
     audio_model, audio_mean, audio_std, n_audio = load_model_branch(audio_ckpt, "audio", args.num_classes, device)
 
-    num_classes = n_face if face_model else (n_audio if audio_model else args.num_classes)
+    # Nếu audio là 4 lớp (DataViet) còn face là 7 lớp -> chiếu face 7->4 lớp để fusion đồng bộ
+    num_classes = n_audio if (audio_model and n_audio == 4) else (n_face if face_model else (n_audio if audio_model else args.num_classes))
     labels_en = class_names(num_classes)
-    labels_vi = EMOTIONS_VI[:num_classes]
+    labels_vi = class_names_vi(num_classes)
 
     if face_model is None and audio_model is None:
         print("\n[CHÚ Ý] Chưa tìm thấy checkpoint trong thư mục runs/!")
@@ -330,6 +334,9 @@ def main():
                         with torch.no_grad():
                             logits_f = face_model(f_in)
                             p_f = F.softmax(logits_f, dim=-1).cpu().numpy()[0]
+                        if num_classes == 4 and len(p_f) == 7:
+                            p_f = p_f[FACE7_TO_4_IDX]
+                            p_f = p_f / (p_f.sum() + 1e-9)
                     else:
                         # Demo mock khi chưa có file weights
                         p_f = np.ones(num_classes, dtype=np.float32) / num_classes

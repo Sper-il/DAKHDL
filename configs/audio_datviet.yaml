@@ -1,0 +1,25 @@
+# Fine-tune AudioCNN trên bộ DataViet sạch (4 lớp: angry, happy, sad, neutral)
+name: audio_datviet_4c
+branch: audio
+data_root: /content/data_datviet
+num_classes: 4
+
+model:
+  dropout: 0.4
+
+train:
+  epochs: 40
+  batch_size: 64
+  lr: 0.0003
+  weight_decay: 0.001
+  warmup_epochs: 2
+  class_weight: inv_sqrt
+  early_stop_patience: 10
+
+augment:
+  freq_mask: 24
+  time_mask: 32
+  n_masks: 2
+
+logging:
+  out_dir: runs

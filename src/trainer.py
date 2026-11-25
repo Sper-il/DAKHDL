@@ -217,16 +217,16 @@ def final_report(model, loaders, data, cfg, names, out_dir, device, use_amp, spl
 
 
 # ----------------------------------------------------------------- fit
-def fit(cfg: dict, run_dir, resume: bool = False) -> dict:
+def fit(cfg: dict, run_dir, resume: bool = False, init_ckpt: str | None = None) -> dict:
     run_dir = Path(run_dir)
     logger = RunLogger(run_dir, cfg, use_tensorboard=bool(cfg["logging"]["tensorboard"]))
     try:
-        return _fit(cfg, run_dir, logger, resume)
+        return _fit(cfg, run_dir, logger, resume, init_ckpt=init_ckpt)
     finally:
         logger.close()
 
 
-def _fit(cfg, run_dir, logger, resume):
+def _fit(cfg, run_dir, logger, resume, init_ckpt=None):
     t, lg = cfg["train"], cfg["logging"]
     n = int(cfg["num_classes"])
     names = class_names(n)
@@ -269,6 +269,16 @@ def _fit(cfg, run_dir, logger, resume):
         scaler.load_state_dict(ck["scaler"])
         start_epoch, best, bad, global_step = ck["epoch"] + 1, ck["best"], ck["bad"], ck["global_step"]
         logger.info(f"Tiếp tục từ epoch {start_epoch} (đã có best = {best})")
+    elif init_ckpt:
+        ck = load_ckpt(init_ckpt, device)
+        src_state = ck["model"] if isinstance(ck, dict) and "model" in ck else ck
+        cur_state = model.state_dict()
+        matched = {k: v for k, v in src_state.items() if k in cur_state and v.shape == cur_state[k].shape}
+        skipped = [k for k in cur_state if k not in matched]
+        cur_state.update(matched)
+        model.load_state_dict(cur_state)
+        logger.info(f"Fine-tune từ {init_ckpt}: nạp {len(matched)}/{len(cur_state)} tensor khớp kích thước"
+                    + (f" (khởi tạo mới: {skipped})" if skipped else ""))
     tracker = ParamTracker(model, lg["param_every_steps"])
 
     metric = t["early_stop_metric"]
